@@ -1,4 +1,4 @@
-"""HTTPS-only URL opener shared by the catalog and .gme downloads."""
+"""HTTPS-only URL opener shared by the catalog, portal and .gme downloads."""
 
 from __future__ import annotations
 
@@ -19,4 +19,17 @@ class HTTPSOnlyRedirectHandler(urllib.request.HTTPRedirectHandler):
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
-https_opener = urllib.request.build_opener(HTTPSOnlyRedirectHandler)
+class UserAgentHandler(urllib.request.BaseHandler):
+    """Send a project User-Agent - ravensburger.cloud answers 403 to the default Python-urllib one."""
+
+    USER_AGENT = "tiptoi-manager-linux/0.1 (+https://github.com/isengard412/tiptoi_manager_linux)"
+
+    def http_request(self, request):
+        if not request.has_header("User-Agent"):
+            request.add_unredirected_header("User-Agent", self.USER_AGENT)
+        return request
+
+    https_request = http_request
+
+
+https_opener = urllib.request.build_opener(HTTPSOnlyRedirectHandler, UserAgentHandler)

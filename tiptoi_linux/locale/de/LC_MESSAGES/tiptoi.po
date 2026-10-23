@@ -887,3 +887,21 @@ msgid "{n} product"
 msgid_plural "{n} products"
 msgstr[0] "{n} Produkt"
 msgstr[1] "{n} Produkte"
+
+msgid "Loading product covers…"
+msgstr "Coverbilder werden geladen…"
+
+msgid "failed to download the product portal page: {error}"
+msgstr "Fehler beim Herunterladen der Produkt-Portalseite: {error}"
+
+msgid "the portal page response exceeds {max_bytes} bytes"
+msgstr "Die Antwort der Portalseite überschreitet {max_bytes} Bytes"
+
+msgid "the portal page listed no products; refusing to cache it"
+msgstr "Die Portalseite listete keine Produkte; wird nicht zwischengespeichert"
+
+msgid "failed to download cover {item}: {error}"
+msgstr "Fehler beim Herunterladen des Covers {item}: {error}"
+
+msgid "cover {item} has an unexpected size"
+msgstr "Das Cover {item} hat eine unerwartete Größe"

@@ -160,9 +160,25 @@ class HelpScreen(QWidget):
 
 
 class TiptoiWindow(QMainWindow):
-    def __init__(self, services: Services | None = None) -> None:
+    def __init__(
+        self,
+        services: Services | None = None,
+        *,
+        portal_loader=None,
+        cover_fetcher=None,
+    ) -> None:
         super().__init__()
         self._services = services if services is not None else Services()
+        if portal_loader is None:
+            from tiptoi_linux.enrich import fetch_portal_index
+
+            portal_loader = fetch_portal_index
+        if cover_fetcher is None:
+            from tiptoi_linux.enrich import download_cover
+
+            cover_fetcher = download_cover
+        self._portal_loader = portal_loader
+        self._cover_fetcher = cover_fetcher
         self.setWindowTitle(_("unofficial tiptoi Manager"))
         self.resize(1100, 700)
 
@@ -247,6 +263,9 @@ class TiptoiWindow(QMainWindow):
         self._catalog_job.finished.connect(self._on_catalog_job_finished)
         self._close_when_idle = False
 
+        self._cover_job = BackgroundJob(self)
+        self._cover_job.finished.connect(self._on_cover_job_finished)
+
         self._pen_job = BackgroundJob(self)
         self._pen_job.finished.connect(self._on_pen_job_finished)
         self._progress_phase: Phase | None = None
@@ -286,7 +305,15 @@ class TiptoiWindow(QMainWindow):
         self._start_load(force=False)
 
     def _on_catalog_job_finished(self) -> None:
-        if self._close_when_idle:
+        if self._close_when_idle and not self._catalog_job.is_running and not self._cover_job.is_running:
+            self._close_when_idle = False
+            self.close()
+            from PySide6.QtWidgets import QApplication
+
+            QApplication.quit()
+
+    def _on_cover_job_finished(self) -> None:
+        if self._close_when_idle and not self._catalog_job.is_running and not self._cover_job.is_running:
             self._close_when_idle = False
             self.close()
             from PySide6.QtWidgets import QApplication
@@ -307,6 +334,7 @@ class TiptoiWindow(QMainWindow):
             text = ngettext("{n} product", "{n} products", n).format(n=n)
         self.download_screen.result_count.setText(text)
         self._show_status(_("Catalog cached at {path}").format(path=cache_path()))
+        self._start_cover_refresh()
         if self._pen_job.is_running:
             self._summary_refresh_pending = True
         elif isinstance(self._connection, Connected):
@@ -315,6 +343,64 @@ class TiptoiWindow(QMainWindow):
     def _show_error(self, message: str) -> None:
         self._show_status(_("error: {message}").format(message=message))
         QMessageBox.warning(self, _("unofficial tiptoi Manager"), message)
+
+    # --- covers --------------------------------------------------------------
+
+    def _start_cover_refresh(self) -> None:
+        """Map products to article numbers and download covers into the cache.
+
+        Covers are cosmetic: any failure here is quiet (status line only).
+        """
+        if self._catalog is None or self._cover_job.is_running:
+            return
+        products = self._catalog.catalog.products
+        portal_loader = self._portal_loader
+        cover_fetcher = self._cover_fetcher
+
+        def task(progress):
+            from tiptoi_linux.enrich import EnrichError
+
+            try:
+                index = portal_loader()
+            except EnrichError:
+                return None
+            mapping: dict[str, str] = {}
+            for product in products:
+                item = index.item_for(product.name)
+                if item:
+                    mapping[product.name] = item
+            done = 0
+            for name, item in mapping.items():
+                try:
+                    cover_fetcher(item)
+                except EnrichError:
+                    pass
+                done += 1
+                progress(Phase.DOWNLOAD, done, len(mapping))
+            return mapping
+
+        def succeeded(mapping) -> None:
+            self._progress_bar.setVisible(False)
+            if mapping:
+                self._model.set_items(mapping)
+
+        def failed(message: str) -> None:
+            self._progress_bar.setVisible(False)
+            self._show_status(_("error: {message}").format(message=message))
+
+        if not self._cover_job.start(
+            task, succeeded, failed, on_progress=self._on_cover_progress
+        ):
+            return
+        self._progress_bar.setRange(0, 0)
+        self._progress_bar.setVisible(True)
+        self._show_status(_("Loading product covers…"))
+
+    def _on_cover_progress(self, phase: Phase, done: int, total: int | None) -> None:
+        if total:
+            if self._progress_bar.maximum() != 100:
+                self._progress_bar.setRange(0, 100)
+            self._progress_bar.setValue(percent(done, total))
 
     # --- selection -----------------------------------------------------------
 
@@ -586,7 +672,8 @@ class TiptoiWindow(QMainWindow):
             return
         self._poll_timer.stop()
         self._catalog_job.stop(0)
-        if self._catalog_job.is_running:
+        self._cover_job.stop(0)
+        if self._catalog_job.is_running or self._cover_job.is_running:
             self._close_when_idle = True
             self.hide()
             event.ignore()

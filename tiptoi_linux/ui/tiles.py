@@ -23,18 +23,51 @@ LABEL_HEIGHT = 44
 
 
 class CoverTableModel(ProductTableModel):
-    """ProductTableModel + per-product cover pixmaps (DecorationRole)."""
+    """ProductTableModel + covers from the local cache (DecorationRole).
+
+    The portal mapping (product name -> article number) is set once the index is
+    loaded; pixmaps are read lazily from the cover cache when a tile paints, so
+    memory stays bounded regardless of catalog size.
+    """
+
+    _MAX_CACHED_PIXMAPS = 160
 
     def __init__(self, products=(), parent=None) -> None:
         super().__init__(products, parent)
-        self._covers: dict[str, QPixmap] = {}
+        self._items: dict[str, str] = {}
+        self._loaded: dict[str, QPixmap] = {}
+        self._covers_dir = None
 
-    def set_cover(self, product_name: str, pixmap: QPixmap) -> None:
-        self._covers[product_name] = pixmap
-        self.dataChanged.emit(self.index(0, 0), self.index(self.rowCount() - 1, 0))
+    def set_items(self, items: dict[str, str]) -> None:
+        """product name -> article number; triggers a repaint of the grid."""
+        if items == self._items:
+            return
+        self._items = dict(items)
+        self._loaded.clear()
+        top_left = self.index(0, Column.NAME)
+        bottom_right = self.index(self.rowCount() - 1, Column.NAME)
+        if self.rowCount():
+            self.dataChanged.emit(top_left, bottom_right, [Qt.ItemDataRole.DecorationRole])
 
     def cover_for(self, product: Product) -> QPixmap | None:
-        return self._covers.get(product.name)
+        item = self._items.get(product.name)
+        if not item:
+            return None
+        cached = self._loaded.get(product.name)
+        if cached is not None:
+            return cached
+        from tiptoi_linux.enrich import cache_dir
+
+        path = (self._covers_dir or cache_dir()) / f"{item}.webp"
+        if not path.is_file():
+            return None
+        pixmap = QPixmap(str(path))
+        if pixmap.isNull():
+            return None
+        if len(self._loaded) >= self._MAX_CACHED_PIXMAPS:
+            self._loaded.clear()
+        self._loaded[product.name] = pixmap
+        return pixmap
 
     def data(self, index: QModelIndex | QPersistentModelIndex, role: int = Qt.ItemDataRole.DisplayRole):
         if index.isValid() and index.column() == Column.NAME and role == Qt.ItemDataRole.DecorationRole:
@@ -85,7 +118,11 @@ class TileDelegate(QStyledItemDelegate):
         if pixmap is None and product is not None:
             pixmap = _placeholder_cover(product.name, cover.size())
         if pixmap is not None:
-            painter.drawPixmap(cover, pixmap)
+            # aspect-fill: scale to cover the rect, then center-crop (no stretching)
+            scaled = pixmap.scaled(cover.size(), Qt.AspectRatioMode.KeepAspectRatioByExpanding, Qt.TransformationMode.SmoothTransformation)
+            x = cover.x() + (cover.width() - scaled.width()) / 2
+            y = cover.y() + (cover.height() - scaled.height()) / 2
+            painter.drawPixmap(int(x), int(y), scaled)
         painter.setClipping(False)
         painter.setPen(QPen(QColor(theme.ICON_PINK), 1.0))
         painter.setBrush(Qt.BrushStyle.NoBrush)
