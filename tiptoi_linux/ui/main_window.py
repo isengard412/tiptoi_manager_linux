@@ -15,14 +15,13 @@ from PySide6.QtCore import QModelIndex, QSortFilterProxyModel, Qt, QTimer
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QHBoxLayout,
-    QHeaderView,
     QLabel,
+    QListView,
     QMainWindow,
     QMessageBox,
     QProgressBar,
     QPushButton,
     QStackedWidget,
-    QTableView,
     QVBoxLayout,
     QWidget,
 )
@@ -36,7 +35,6 @@ from tiptoi_linux.gui import (
     ConnectionState,
     BackgroundJob,
     PenPanel,
-    ProductTableModel,
     Services,
     _PHASE_STATUS_TEXT,
     next_poll_action,
@@ -45,7 +43,7 @@ from tiptoi_linux.gui import (
 from tiptoi_linux.i18n import _, ngettext
 from tiptoi_linux.pen import Pen, PenSummary, Phase
 from tiptoi_linux.streams import percent
-from tiptoi_linux.ui import theme, widgets
+from tiptoi_linux.ui import theme, tiles, widgets
 
 T = TypeVar("T")
 
@@ -64,7 +62,7 @@ def version_text() -> str:
 
 
 class DownloadScreen(QWidget):
-    """Search + product list + install action (tile grid arrives with Phase 3)."""
+    """Search + product tile grid + install action, like the original download screen."""
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -74,18 +72,18 @@ class DownloadScreen(QWidget):
         self.result_count = QLabel("")
         self.result_count.setObjectName("ResultCount")
 
-        self.table = QTableView()
-        self.table.setSortingEnabled(True)
-        self.table.setSelectionBehavior(QTableView.SelectionBehavior.SelectRows)
-        self.table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self.table.setAlternatingRowColors(False)
-        self.table.setShowGrid(False)
-        self.table.setAccessibleName(_("Products"))
-        header = self.table.horizontalHeader()
-        header.setStretchLastSection(False)
-        header.setSectionResizeMode(Column.ON_PEN, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(Column.NAME, QHeaderView.ResizeMode.Stretch)
-        self.table.verticalHeader().setVisible(False)
+        self.grid = QListView()
+        self.grid.setObjectName("productGrid")
+        self.grid.setViewMode(QListView.ViewMode.IconMode)
+        self.grid.setResizeMode(QListView.ResizeMode.Adjust)
+        self.grid.setWrapping(True)
+        self.grid.setUniformItemSizes(True)
+        self.grid.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.grid.setSpacing(0)
+        self.grid.setFrameShape(QListView.Shape.NoFrame)
+        self.grid.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.grid.setAccessibleName(_("Products"))
+        self.grid.setItemDelegate(tiles.TileDelegate(self.grid))
 
         self.install_button = widgets.pill_button(_("Install on pen"), primary=True)
         self.install_button.setAccessibleName(_("Install selected"))
@@ -100,7 +98,7 @@ class DownloadScreen(QWidget):
         layout.setContentsMargins(18, 16, 18, 12)
         layout.addLayout(row)
         layout.addWidget(self.result_count)
-        layout.addWidget(self.table, stretch=1)
+        layout.addWidget(self.grid, stretch=1)
 
 
 class PlaceholderScreen(QWidget):
@@ -168,7 +166,7 @@ class TiptoiWindow(QMainWindow):
         self.setWindowTitle(_("unofficial tiptoi Manager"))
         self.resize(1100, 700)
 
-        self._model = ProductTableModel()
+        self._model = tiles.CoverTableModel()
         self._proxy = QSortFilterProxyModel(self)
         self._proxy.setSourceModel(self._model)
         self._proxy.setFilterKeyColumn(Column.NAME)
@@ -188,13 +186,13 @@ class TiptoiWindow(QMainWindow):
         self._footer.layout().insertWidget(5, self._progress_bar)
 
         self.download_screen = DownloadScreen()
-        self.download_screen.table.setModel(self._proxy)
+        self.download_screen.grid.setModel(self._proxy)
         self.download_screen.search.textChanged.connect(self._proxy.setFilterFixedString)
         self.download_screen.install_button.clicked.connect(self._start_install_selected)
-        self.download_screen.table.selectionModel().selectionChanged.connect(
+        self.download_screen.grid.selectionModel().selectionChanged.connect(
             self._update_install_button_enabled
         )
-        self.download_screen.table.doubleClicked.connect(self._on_table_double_clicked)
+        self.download_screen.grid.doubleClicked.connect(self._on_grid_double_clicked)
 
         self.pen_panel = PenPanel()
         self.pen_panel.detect_button.clicked.connect(lambda: self._detect())
@@ -321,13 +319,13 @@ class TiptoiWindow(QMainWindow):
     # --- selection -----------------------------------------------------------
 
     def _selected_product(self) -> Product | None:
-        indexes = self.download_screen.table.selectionModel().selectedRows()
+        indexes = self.download_screen.grid.selectionModel().selectedIndexes()
         if not indexes:
             return None
         source_index = self._proxy.mapToSource(indexes[0])
         return self._model.product_at(source_index.row())
 
-    def _on_table_double_clicked(self, index: QModelIndex) -> None:
+    def _on_grid_double_clicked(self, index: QModelIndex) -> None:
         if not index.isValid():
             return
         if self.download_screen.install_button.isEnabled():
@@ -340,7 +338,7 @@ class TiptoiWindow(QMainWindow):
         return self._pen() is not None and not self._pen_job.is_running
 
     def _update_install_button_enabled(self) -> None:
-        has_selection = bool(self.download_screen.table.selectionModel().selectedRows())
+        has_selection = bool(self.download_screen.grid.selectionModel().selectedIndexes())
         self.download_screen.install_button.setEnabled(self._pen_idle() and has_selection)
 
     def _update_delete_button_enabled(self) -> None:

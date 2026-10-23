@@ -106,7 +106,7 @@ class ShellTests(unittest.TestCase):
         self.window._detect()
         _pump_until_idle(self.app, self.window._pen_job)
         index = self.window._proxy.index(0, 0)
-        self.window.download_screen.table.selectRow(index.row())
+        self.window.download_screen.grid.setCurrentIndex(index)
         self.assertTrue(self.window.download_screen.install_button.isEnabled())
 
     def test_pen_card_disconnected_text(self) -> None:

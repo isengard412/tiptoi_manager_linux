@@ -178,6 +178,10 @@ def build_style_sheet() -> str:
     QListWidget::item {{ padding: 4px 6px; border-radius: 6px; }}
     QListWidget::item:selected {{ background: {HEADER_ORANGE_SOFT}; color: {FRAME_TEAL}; }}
 
+    QListView#productGrid {{ background: {BG_WHITE}; border: none; outline: none; }}
+    QListView#productGrid::item {{ border: none; }}
+    QListView#productGrid::item:selected {{ background: {HEADER_ORANGE_SOFT}; border-radius: 10px; }}
+
     /* --- storage / progress bars -------------------------------------- */
     QProgressBar {{
         border: none;
