@@ -771,3 +771,119 @@ msgstr "{name} ist kein Titel auf dem Stift"
 #, python-brace-format
 msgid "cannot delete {name} from the pen: {error}"
 msgstr "{name} kann nicht vom Stift gelöscht werden: {error}"
+
+# --- new shell UI (tiptoi_linux/ui) ---
+msgid "error: the GUI requires PySide6 - install with: pip install '.[gui]'"
+msgstr "Fehler: Die GUI benötigt PySide6 - Installation mit: pip install '.[gui]'"
+
+msgid "unofficial tiptoi Manager for Linux {version}"
+msgstr "Inoffizieller tiptoi Manager für Linux {version}"
+
+msgid "Search for a product name…"
+msgstr "Produktnamen suchen…"
+
+msgid "Install on pen"
+msgstr "Auf dem Stift installieren"
+
+msgid "Help and information"
+msgstr "Hilfe und Informationen"
+
+msgid "This is an unofficial, community-managed tool. It is not affiliated with or endorsed by Ravensburger. \"tiptoi\" is a trademark of Ravensburger AG."
+msgstr "Dies ist ein inoffizielles, community-getragenes Werkzeug. Es steht in keiner Verbindung zu Ravensburger und wird nicht von Ravensburger unterstützt. \"tiptoi\" ist eine Marke der Ravensburger AG."
+
+msgid "unofficial tiptoi Manager"
+msgstr "Inoffizieller tiptoi Manager"
+
+msgid "Refresh catalog"
+msgstr "Katalog aktualisieren"
+
+msgid "tiptoi FAQ"
+msgstr "Häufige Fragen (FAQ) zu tiptoi"
+
+msgid "Manual audio file download"
+msgstr "Audiodateien manuell herunterladen"
+
+msgid "tiptoi charging station"
+msgstr "tiptoi Ladestation"
+
+msgid "tiptoi Wi-Fi pen"
+msgstr "tiptoi Stift mit WLAN"
+
+msgid "Privacy"
+msgstr "Datenschutz"
+
+msgid "Legal notice"
+msgstr "Impressum"
+
+msgid "Product catalog"
+msgstr "Produktkatalog"
+
+msgid "The browsable catalog with categories and covers arrives with the next milestone."
+msgstr "Der durchsuchbare Katalog mit Kategorien und Coverbildern folgt im nächsten Meilenstein."
+
+msgid "Audiobooks and songs"
+msgstr "Hörbücher und Lieder"
+
+msgid "Buying and licensing audiobooks requires a Ravensburger account and is not supported by this unofficial manager."
+msgstr "Der Kauf von Hörbüchern und Liedern erfordert ein Ravensburger-Kundenkonto und wird von diesem inoffiziellen Manager nicht unterstützt."
+
+msgid "Pen ready"
+msgstr "Stift bereit"
+
+msgid "Catalog cached at {path}"
+msgstr "Katalog gespeichert unter {path}"
+
+msgid "Delete these titles from the pen?\n\n{names}"
+msgstr "Diese Titel vom Stift löschen?\n\n{names}"
+
+msgid "Connected"
+msgstr "Verbunden"
+
+msgid "Plugged in, not mounted"
+msgstr "Eingesteckt, nicht eingehängt"
+
+msgid "Unmounted — safe to unplug"
+msgstr "Ausgehängt — kann sicher entfernt werden"
+
+msgid "Load audio\nfiles"
+msgstr "Audiodateien\nladen"
+
+msgid "Browse product\ncatalog"
+msgstr "Produktkatalog\nansehen"
+
+msgid "Buy audiobooks\nand songs"
+msgstr "Hörbücher und\nLieder kaufen"
+
+msgid "Manage pen\nand content"
+msgstr "Stift und Inhalte\nverwalten"
+
+msgid "Help and\ninformation"
+msgstr "Hilfe und\nInformationen"
+
+msgid "Your pen"
+msgstr "Ihr Stift"
+
+msgid "Not connected"
+msgstr "Nicht verbunden"
+
+msgid "unofficial manager for Linux"
+msgstr "Inoffizieller Manager für Linux"
+
+msgid "Options"
+msgstr "Optionen"
+
+msgid "Deleted {n} titles, freed {size}"
+msgstr "{n} Titel gelöscht, {size} freigegeben"
+
+msgid "Deleting {n} titles…"
+msgstr "{n} Titel werden gelöscht…"
+
+msgid "{n} product (offline — cached copy)"
+msgid_plural "{n} products (offline — cached copy)"
+msgstr[0] "{n} Produkt (offline – zwischengespeichert)"
+msgstr[1] "{n} Produkte (offline – zwischengespeichert)"
+
+msgid "{n} product"
+msgid_plural "{n} products"
+msgstr[0] "{n} Produkt"
+msgstr[1] "{n} Produkte"
