@@ -189,5 +189,58 @@ class FirmwareShellTests(unittest.TestCase):
         self.assertFalse(self.window.firmware_panel.update_button.isEnabled())
 
 
+@unittest.skipUnless(_PYSIDE6_AVAILABLE, "PySide6 is not installed")
+class UpdateChainTests(unittest.TestCase):
+    """'Update all outdated titles' installs each outdated product in sequence."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        from PySide6.QtWidgets import QApplication
+
+        cls.app = QApplication.instance() or QApplication([])
+
+    def setUp(self) -> None:
+        import tempfile
+        from pathlib import Path
+
+        from tiptoi_linux.gui import Services
+        from tiptoi_linux.pen import Pen
+        from tiptoi_linux.ui.main_window import TiptoiWindow
+
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.pen_dir = Path(self.tmp.name)
+        # a .gme whose embedded version date (20190101) is older than the catalog (20190929)
+        header = b"\0" * 0x20 + b"WissenQuizzenTiere 20190101\0"
+        (self.pen_dir / "WissenQuizzenTiere.gme").write_bytes(header)
+        pen = Pen(mountpoint=self.pen_dir, source=None)
+        self.installed: list[str] = []
+        services = Services(
+            load_catalog=lambda **kw: LoadedCatalog(parse_catalog(FIXTURE_CSV)),
+            find_pen=lambda **kw: pen,
+            install_title=lambda p, product, progress=None: self.installed.append(product.name),
+            device_plugged_in=lambda: False,
+            device_mounted=lambda: False,
+            pen_mount_alive=lambda p: True,
+        )
+        self.window = TiptoiWindow(services=services)
+        self.window._poll_timer.stop()
+
+    def test_chain_installs_outdated_product(self) -> None:
+        from tests.test_gui import _pump_until_idle
+
+        self.window.start_initial_load()
+        _pump_until_idle(self.app, self.window._catalog_job)
+        self.window._detect()
+        _pump_until_idle(self.app, self.window._pen_job)
+        self.assertTrue(self.window.update_outdated_button.isEnabled())
+
+        self.window._start_update_outdated()
+        _pump_until_idle(self.app, self.window._pen_job)
+        self.assertEqual(self.installed, ["WissenQuizzenTiere"])
+        self.assertEqual(self.window._update_queue, [])
+        self.assertFalse(self.window._update_chain_active)
+
+
 if __name__ == "__main__":
     unittest.main()

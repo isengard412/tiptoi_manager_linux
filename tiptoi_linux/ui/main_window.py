@@ -245,11 +245,15 @@ class TiptoiWindow(QMainWindow):
         self.pen_panel.installed_list.itemSelectionChanged.connect(self._update_delete_button_enabled)
         self.firmware_panel = widgets.FirmwarePanel()
         self.firmware_panel.update_requested.connect(self._start_firmware_update)
+        self.update_outdated_button = widgets.pill_button(_("Update all outdated titles"), primary=True)
+        self.update_outdated_button.setEnabled(False)
+        self.update_outdated_button.clicked.connect(self._start_update_outdated)
         pen_screen_host = QWidget()
         pen_layout = QVBoxLayout(pen_screen_host)
         pen_layout.setContentsMargins(18, 16, 18, 12)
         pen_layout.addWidget(self.firmware_panel)
         pen_layout.addWidget(self.pen_panel)
+        pen_layout.addWidget(self.update_outdated_button, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self._stack = QStackedWidget()
         self._stack.addWidget(self.download_screen)
@@ -301,6 +305,9 @@ class TiptoiWindow(QMainWindow):
         self._connection: ConnectionState | Connected = ConnectionState.DISCONNECTED
         self._firmware_info = None  # FirmwareInfo | None
         self._pen_fields: dict[str, str] = {}
+        self._update_queue: list[Product] = []
+        self._update_chain_active = False
+        self._outdated_count = 0
 
         self._poll_timer = QTimer(self)
         self._poll_timer.setInterval(POLL_INTERVAL_MS)
@@ -621,6 +628,14 @@ class TiptoiWindow(QMainWindow):
         self._progress_bar.setVisible(False)
         self._update_action_buttons_enabled()
         self._update_firmware_panel()
+        if self._update_queue:
+            self._update_next()
+        elif self._update_chain_active:
+            self._update_chain_active = False
+            self._show_status(_("All titles are up to date"))
+            if isinstance(self._connection, Connected):
+                self._refresh_pen_summary(self._connection.pen, quiet=True)
+        self._update_outdated_button()
         if self._summary_refresh_pending:
             self._summary_refresh_pending = False
             if isinstance(self._connection, Connected):
@@ -650,10 +665,12 @@ class TiptoiWindow(QMainWindow):
         self.pen_panel.show_summary(summary)
         self._model.set_installed(summary.installed)
         self._pen_fields = read_pen_log(summary.pen)
+        self._outdated_count = len(summary.outdated)
         self._update_action_buttons_enabled()
         self._update_pen_card()
         self._update_firmware_panel()
         self._update_footer_info()
+        self._update_outdated_button()
         if announce:
             self._show_status(message if message is not None else _("Pen ready"))
 
@@ -686,10 +703,14 @@ class TiptoiWindow(QMainWindow):
         self.pen_panel.reset()
         self._model.set_installed(())
         self._pen_fields = {}
+        self._update_queue = []
+        self._update_chain_active = False
+        self._outdated_count = 0
         self._update_action_buttons_enabled()
         self._update_pen_card()
         self._update_firmware_panel()
         self._update_footer_info()
+        self.update_outdated_button.setEnabled(False)
 
     def _state_without_pen(self) -> ConnectionState:
         if self._services.device_plugged_in():
@@ -697,6 +718,81 @@ class TiptoiWindow(QMainWindow):
         return ConnectionState.DISCONNECTED
 
     # --- firmware ------------------------------------------------------------
+
+    def _update_outdated_button(self) -> None:
+        # WHY: while a pen job is in flight its succeeded callback still sees is_running=True,
+        # so the final state is applied from _on_pen_job_finished as well
+        enabled = (
+            self._outdated_count > 0
+            and self._catalog is not None
+            and isinstance(self._connection, Connected)
+            and not self._pen_job.is_running
+            and not self._update_chain_active
+        )
+        self.update_outdated_button.setEnabled(enabled)
+
+    def _start_update_outdated(self) -> None:
+        """Queue every outdated title and install them one after another."""
+        pen = self._pen()
+        if pen is None or self._catalog is None or self._pen_job.is_running:
+            return
+        from tiptoi_linux.catalog import CatalogError, gme_file_name
+        from tiptoi_linux.pen import outdated_titles
+
+        outdated_names = {t.file_name.casefold() for t in outdated_titles(pen, self._catalog.catalog)}
+        queue: list[Product] = []
+        for product in self._catalog.catalog.products:
+            try:
+                name = gme_file_name(product).casefold()
+            except CatalogError:
+                continue
+            if name in outdated_names:
+                queue.append(product)
+        if not queue:
+            return
+        self._update_queue = queue
+        self._update_chain_active = True
+        self._update_next()
+
+    def _update_next(self) -> None:
+        """Install the head of the queue; the chain continues from _on_pen_job_finished.
+
+        WHY: BackgroundJob callbacks run while the job is still active, so the next
+        start() must wait for the finished signal - chaining in `then` would be dropped.
+        """
+        if not self._update_queue:
+            return
+        product = self._update_queue[0]
+        pen = self._pen()
+        if pen is None or self._catalog is None:
+            self._update_queue = []
+            return
+        services = self._services
+
+        def install(progress):
+            services.install_title(pen, product, progress=progress)
+            return pen, None
+
+        def failed(message: str) -> None:
+            self._update_queue = []
+            self._update_chain_active = False
+            self._show_error(message)
+
+        self._run_pen_op(
+            install,
+            _("Installing {name}…").format(name=product.name),
+            describe=lambda _r: _("Installed {name} — verified on the pen").format(name=product.name),
+            then=lambda _result: self._update_queue.pop(0),
+            on_failure=failed,
+            changes_pen=True,
+            announce=False,
+        )
+
+    def _finish_update_chain(self) -> None:
+        if self._update_queue:
+            self._update_next()
+            return
+        self._show_status(_("All titles are up to date"))
 
     _FIRMWARE_LOG_KEYS = ("firmwareversion", "firmware", "fw", "version")
     _SERIAL_LOG_KEYS = ("serialnumber", "serial", "sn")

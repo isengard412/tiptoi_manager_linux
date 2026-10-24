@@ -989,3 +989,9 @@ msgstr "Alle"
 
 msgid "Search the catalog…"
 msgstr "Produktkatalog durchsuchen…"
+
+msgid "Update all outdated titles"
+msgstr "Alle veralteten Titel aktualisieren"
+
+msgid "All titles are up to date"
+msgstr "Alle Titel sind aktuell"
