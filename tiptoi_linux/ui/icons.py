@@ -158,13 +158,37 @@ def circle_icon(color: str, glyph: Glyph, px: int = 64) -> QIcon:
 
 
 # The five nav entries and their circle colors, mirroring the original order.
-NAV_ICONS: dict[str, QIcon] = {
-    "download": circle_icon(theme.BRAND_ORANGE, _glyph_download),
-    "catalog": circle_icon(theme.ICON_GREEN, _glyph_book),
-    "audiobooks": circle_icon(theme.ICON_PINK, _glyph_music),
-    "pen": circle_icon(theme.ICON_ORANGE, gear_glyph(theme.ICON_ORANGE)),
-    "help": circle_icon(theme.ICON_BLUE, _glyph_question),
+# WHY lazy: QPixmap/QIcon must not be constructed before a QGuiApplication exists,
+# so icons are built on first use, never at module import time.
+_NAV_SPECS = {
+    "download": (theme.BRAND_ORANGE, _glyph_download),
+    "catalog": (theme.ICON_GREEN, _glyph_book),
+    "audiobooks": (theme.ICON_PINK, _glyph_music),
+    "pen": (theme.ICON_ORANGE, gear_glyph(theme.ICON_ORANGE)),
+    "help": (theme.ICON_BLUE, _glyph_question),
 }
 
-SEARCH_ICON = circle_icon(theme.BRAND_ORANGE, _glyph_search)
-PEN_DEVICE_ICON = circle_icon(theme.ICON_BLUE, _glyph_pen)
+_ICON_CACHE: dict[str, QIcon] = {}
+
+
+def nav_icon(key: str) -> QIcon:
+    icon = _ICON_CACHE.get(key)
+    if icon is None:
+        color, glyph = _NAV_SPECS[key]
+        icon = circle_icon(color, glyph)
+        _ICON_CACHE[key] = icon
+    return icon
+
+
+def search_icon() -> QIcon:
+    key = "__search__"
+    if key not in _ICON_CACHE:
+        _ICON_CACHE[key] = circle_icon(theme.BRAND_ORANGE, _glyph_search)
+    return _ICON_CACHE[key]
+
+
+def pen_device_icon() -> QIcon:
+    key = "__pen_device__"
+    if key not in _ICON_CACHE:
+        _ICON_CACHE[key] = circle_icon(theme.ICON_BLUE, _glyph_pen)
+    return _ICON_CACHE[key]

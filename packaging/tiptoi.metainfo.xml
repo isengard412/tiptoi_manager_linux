@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.tiptoi_linux.tiptoi</id>
-  <name>tiptoi</name>
-  <summary>Download tiptoi titles and copy them to the pen</summary>
-  <summary xml:lang="de">tiptoi-Titel herunterladen und auf den Stift kopieren</summary>
+  <id>io.github.isengard412.tiptoi_manager_linux</id>
+  <name>unofficial tiptoi Manager for Linux</name>
+  <summary>Download tiptoi titles, browse the catalog and update your pen</summary>
+  <summary xml:lang="de">tiptoi-Titel herunterladen, Katalog durchsuchen und den Stift aktualisieren</summary>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
   <description>
     <p>
-      tiptoi is an unofficial, third-party manager for the Ravensburger tiptoi audio pen. It
-      browses the live product catalog, downloads titles, copies them onto the pen with an
-      on-device verification, shows which installed titles are outdated, deletes titles, and
-      mounts and unmounts the pen safely.
+      An unofficial, community-managed replacement for the Ravensburger tiptoi Manager,
+      which only exists for Windows and macOS. It follows the look and everyday workflow
+      of the original application: browse and search the live product catalog with covers
+      and categories, download titles, copy them onto the pen with on-device verification,
+      update outdated titles, install new pen firmware, and mount or unmount the pen safely.
+    </p>
+    <p>
+      This program is not affiliated with or endorsed by Ravensburger. tiptoi is a
+      trademark of Ravensburger AG.
     </p>
   </description>
   <launchable type="desktop-id">tiptoi.desktop</launchable>
@@ -19,10 +24,11 @@
     <id>tiptoi.desktop</id>
   </provides>
   <content_rating type="oars-1.1"/>
-  <developer id="io.github.tiptoi_linux">
-    <name>tiptoi-linux contributors</name>
+  <developer id="io.github.isengard412">
+    <name>isengard412</name>
   </developer>
+  <project_group>none</project_group>
   <releases>
-    <release version="0.1.0" date="2026-09-27"/>
+    <release version="0.1.0" date="2026-10-24"/>
   </releases>
 </component>

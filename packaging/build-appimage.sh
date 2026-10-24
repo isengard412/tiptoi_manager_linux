@@ -449,7 +449,7 @@ main() {
 
     mkdir -p "${appdir}/usr/share/metainfo"
     install -m 644 "${SCRIPT_DIR}/tiptoi.metainfo.xml" \
-        "${appdir}/usr/share/metainfo/io.github.tiptoi_linux.tiptoi.metainfo.xml"
+        "${appdir}/usr/share/metainfo/io.github.isengard412.tiptoi_manager_linux.metainfo.xml"
 
     log "converting icon"
     local icon_png="${WORK_DIR}/tiptoi.png"

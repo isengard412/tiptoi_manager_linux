@@ -60,7 +60,7 @@ class PenCard(QFrame):
         self.free_pill.hide()
 
         self.pen_icon = QLabel()
-        self.pen_icon.setPixmap(icons.PEN_DEVICE_ICON.pixmap(34, 34))
+        self.pen_icon.setPixmap(icons.pen_device_icon().pixmap(34, 34))
 
         text_col = QVBoxLayout()
         text_col.setSpacing(3)
@@ -208,7 +208,7 @@ class NavRail(QWidget):
             button = QToolButton()
             button.setObjectName("NavItem")
             button.setText(label)
-            button.setIcon(icons.NAV_ICONS[icon_key])
+            button.setIcon(icons.nav_icon(icon_key))
             button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
             button.setAccessibleName(accessible)
             button.setCheckable(True)
@@ -271,7 +271,7 @@ class SearchBar(QWidget):
 
         self.button = QPushButton()
         self.button.setObjectName("SearchButton")
-        self.button.setIcon(icons.SEARCH_ICON)
+        self.button.setIcon(icons.search_icon())
         self.button.setIconSize(QSize(26, 26))
         self.button.setFixedSize(38, 38)
         self.button.setCursor(Qt.CursorShape.PointingHandCursor)
