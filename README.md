@@ -33,6 +33,8 @@ Working today (see `docs/PLAN.md` for the roadmap):
 - ✅ firmware update flow (download, byte-sum checksum, staged as `update.upd`)
 - ✅ CLI (`tiptoi …`, incl. `tiptoi pen firmware [--install]`)
 - ✅ German UI aligned with the original wording; language choice in Optionen
+  (System/DE/EN/FR/IT/NL — FR/IT/NL reuse the original application's wording
+  wherever our strings match)
 - ✅ self-update check against GitHub releases
 - ⏳ audio sample previews, product detail overlay, account/WLAN-pen features
   (explicitly out of scope: login and purchases)

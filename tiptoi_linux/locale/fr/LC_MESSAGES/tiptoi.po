@@ -1,0 +1,659 @@
+# French translations for tiptoi-manager-linux.
+# Based on the original tiptoi Manager wording where applicable.
+msgid ""
+msgstr ""
+"Project-Id-Version: tiptoi-manager-linux\n"
+"PO-Revision-Date: 2026-10-24 00:00+0200\n"
+"Last-Translator: tiptoi-manager-linux contributors\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "refusing unsafe product name: {name!r}"
+msgstr "nom de produit non sûr refusé : {name!r}"
+
+msgid "refusing to download catalog over non-https URL: {url}"
+msgstr "refus de télécharger le catalogue depuis une URL non https : {url}"
+
+msgid "failed to download catalog from {url}: {error}"
+msgstr "échec du téléchargement du catalogue depuis {url} : {error}"
+
+msgid "catalog response from {url} exceeds {max_bytes} bytes"
+msgstr "la réponse du catalogue depuis {url} dépasse {max_bytes} octets"
+
+msgid "catalog downloaded from {url} has zero products; refusing to overwrite cache"
+msgstr "le catalogue téléchargé depuis {url} contient zéro produit ; refus d'écraser le cache"
+
+msgid "cannot write catalog cache at {path}: {error}"
+msgstr "impossible d'écrire le cache du catalogue dans {path} : {error}"
+
+msgid "cannot read catalog cache at {path}: {error}"
+msgstr "impossible de lire le cache du catalogue dans {path} : {error}"
+
+msgid "{error}; no cached catalog available at {path}"
+msgstr "{error} ; aucun catalogue en cache disponible dans {path}"
+
+msgid "Manage the tiptoi pen product catalog."
+msgstr "Gérer le catalogue des produits du stylo tiptoi."
+
+msgid "Force-refresh the cached catalog."
+msgstr "Forcer l'actualisation du catalogue en cache."
+
+msgid "List all products in the catalog."
+msgstr "Lister tous les produits du catalogue."
+
+msgid "Search products by name."
+msgstr "Rechercher des produits par nom."
+
+msgid "Substring to search for (case-insensitive)."
+msgstr "Sous-chaîne recherchée (insensible à la casse)."
+
+msgid "Download a product's .gme file into the cache."
+msgstr "Télécharger le fichier .gme d'un produit dans le cache."
+
+msgid "Exact product name, as shown by 'tiptoi list'."
+msgstr "Nom exact du produit, tel qu'affiché par « tiptoi list »."
+
+msgid "Inspect or install onto a tiptoi pen."
+msgstr "Inspecter ou installer sur un stylo tiptoi."
+
+msgid "Path to the pen's mountpoint, bypassing auto-detection."
+msgstr "Chemin du point de montage du stylo, sans détection automatique."
+
+msgid "Show the pen's mountpoint, free space, and titles."
+msgstr "Afficher le point de montage, l'espace libre et les titres du stylo."
+
+msgid "Mount the pen."
+msgstr "Monter le stylo."
+
+msgid "Unmount the pen so it can be unplugged."
+msgstr "Démonter le stylo pour pouvoir le débrancher."
+
+msgid "Download (if needed) and install a title."
+msgstr "Télécharger (si nécessaire) et installer un titre."
+
+msgid "Validate and report what would be installed without writing to the pen."
+msgstr "Vérifier et indiquer ce qui serait installé, sans écrire sur le stylo."
+
+msgid "List installed titles with a newer catalog version."
+msgstr "Lister les titres installés dont une version plus récente existe."
+
+msgid "Delete titles from the pen and empty its trash."
+msgstr "Supprimer des titres du stylo et vider sa corbeille."
+
+msgid "On-pen file name(s), as shown by 'tiptoi pen status' (e.g. WN.gme)."
+msgstr "Nom(s) de fichier sur le stylo, tels qu'affichés par « tiptoi pen status » (p. ex. WN.gme)."
+
+msgid "Delete without prompting for confirmation."
+msgstr "Supprimer sans demande de confirmation."
+
+msgid "error: {message}"
+msgstr "erreur : {message}"
+
+msgid "warning: {error} - using stale cached catalog at {path}"
+msgstr "avertissement : {error} – utilisation du catalogue périmé en cache dans {path}"
+
+msgid "Catalog updated: {n} product"
+msgid_plural "Catalog updated: {n} products"
+msgstr[0] "Catalogue mis à jour : {n} produit"
+msgstr[1] "Catalogue mis à jour : {n} produits"
+
+msgid "Cache: {path}"
+msgstr "Cache : {path}"
+
+msgid "catalog is empty - run 'tiptoi update'"
+msgstr "le catalogue est vide – lancez « tiptoi update »"
+
+msgid "No products matching {term!r}"
+msgstr "Aucun produit correspondant à {term!r}"
+
+msgid "Downloading"
+msgstr "Téléchargement"
+
+msgid "Copying to pen"
+msgstr "Copie sur le stylo"
+
+msgid "Verifying on pen"
+msgstr "Vérification sur le stylo"
+
+msgid "{n} bytes"
+msgstr "{n} octets"
+
+msgid "no product named {name!r}"
+msgstr "aucun produit nommé {name!r}"
+
+msgid "Mountpoint: {path}"
+msgstr "Point de montage : {path}"
+
+msgid "Free space: {free} of {total}"
+msgstr "Espace libre : {free} sur {total}"
+
+msgid "Installed titles: none"
+msgstr "Titres installés : aucun"
+
+msgid "Installed titles ({n}):"
+msgstr "Titres installés ({n}) :"
+
+msgid "Mounted at {path}"
+msgstr "Monté dans {path}"
+
+msgid "Unmounted — the pen can be unplugged now"
+msgstr "Démonté — le stylo peut être débranché"
+
+msgid "Would install {name} to {path}"
+msgstr "Installerait {name} dans {path}"
+
+msgid "Installed {name} to {path} ({size}, verified on the pen)"
+msgstr "{name} installé dans {path} ({size}, vérifié sur le stylo)"
+
+msgid "Run 'tiptoi pen unmount' before unplugging the pen."
+msgstr "Lancez « tiptoi pen unmount » avant de débrancher le stylo."
+
+msgid "not installed on the pen: {names}"
+msgstr "non installé(s) sur le stylo : {names}"
+
+msgid "refusing to delete without confirmation; pass --yes"
+msgstr "suppression refusée sans confirmation ; utilisez --yes"
+
+msgid "Titles to delete ({n}):"
+msgstr "Titres à supprimer ({n}) :"
+
+msgid "Delete {n} title from the pen and empty its trash? [y/N] "
+msgid_plural "Delete {n} titles from the pen and empty its trash? [y/N] "
+msgstr[0] "Supprimer {n} titre du stylo et vider sa corbeille ? [o/N] "
+msgstr[1] "Supprimer {n} titres du stylo et vider sa corbeille ? [o/N] "
+
+msgid "Deleted {name}"
+msgstr "{name} supprimé"
+
+msgid "Freed {size}"
+msgstr "{size} libérés"
+
+msgid "All installed titles are up to date"
+msgstr "Tous les titres installés sont à jour"
+
+msgid "refusing non-.gme response ({content_type}) for {url}"
+msgstr "réponse non-.gme refusée ({content_type}) pour {url}"
+
+msgid "refusing unverifiable response with no Content-Length for {url}"
+msgstr "réponse invérifiable sans Content-Length refusée pour {url}"
+
+msgid "failed to download {url}: {error}"
+msgstr "échec du téléchargement de {url} : {error}"
+
+msgid "refusing to download product over non-https URL: {url}"
+msgstr "refus de télécharger un produit depuis une URL non https : {url}"
+
+msgid "refusing unsafe product version: {version!r}"
+msgstr "version de produit non sûre refusée : {version!r}"
+
+msgid "cannot create cache directory {path}: {error}"
+msgstr "impossible de créer le répertoire de cache {path} : {error}"
+
+msgid "downloaded size {actual} for {url} does not match expected size {expected}"
+msgstr "la taille téléchargée {actual} pour {url} ne correspond pas à la taille attendue {expected}"
+
+msgid "cannot finalize download for {url} at {path}: {error}"
+msgstr "impossible de finaliser le téléchargement de {url} dans {path} : {error}"
+
+msgid "On pen"
+msgstr "Sur le stylo"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Version"
+msgstr "Version"
+
+msgid "Downloading…"
+msgstr "Téléchargement…"
+
+msgid "Copying to pen…"
+msgstr "Copie sur le stylo…"
+
+msgid "Verifying on pen…"
+msgstr "Vérification sur le stylo…"
+
+msgid "○ Not connected"
+msgstr "○ Non connecté"
+
+msgid "○ Pen plugged in but not mounted — open it in your file manager"
+msgstr "○ Stylo branché mais non monté — ouvrez-le dans votre gestionnaire de fichiers"
+
+msgid "✓ Unmounted — safe to unplug"
+msgstr "✓ Démonté — retrait sans danger"
+
+msgid "● Connected — {path}"
+msgstr "● Connecté — {path}"
+
+msgid "On the &pen ({n})"
+msgstr "Sur le s&tylo ({n})"
+
+msgid "&Outdated ({n})"
+msgstr "&Périmés ({n})"
+
+msgid "On the pen"
+msgstr "Sur le stylo"
+
+msgid "unexpected error: {error}"
+msgstr "erreur inattendue : {error}"
+
+msgid "Pen storage"
+msgstr "Mémoire du stylo"
+
+msgid "&Detect pen"
+msgstr "&Détecter le stylo"
+
+msgid "Detect pen"
+msgstr "Détecter le stylo"
+
+msgid "&Choose folder…"
+msgstr "Cho&isir un dossier…"
+
+msgid "Choose pen folder"
+msgstr "Choisir le dossier du stylo"
+
+msgid "Titles on the pen"
+msgstr "Titres sur le stylo"
+
+msgid "Outdated titles"
+msgstr "Titres périmés"
+
+msgid "De&lete selected"
+msgstr "&Supprimer la sélection"
+
+msgid "Delete selected titles from the pen"
+msgstr "Supprimer les titres sélectionnés du stylo"
+
+msgid "Storage"
+msgstr "Mémoire"
+
+msgid "{free} free of {total}"
+msgstr "{free} libres sur {total}"
+
+msgid "Task progress"
+msgstr "Progression de la tâche"
+
+msgid "Pen connection"
+msgstr "Connexion du stylo"
+
+msgid "&Mount"
+msgstr "&Monter"
+
+msgid "Mount the pen"
+msgstr "Monter le stylo"
+
+msgid "&Unmount"
+msgstr "Dé&monter"
+
+msgid "Unmount the pen so it can be unplugged"
+msgstr "Démonter le stylo pour pouvoir le débrancher"
+
+msgid "&Search:"
+msgstr "Rec&herche :"
+
+msgid "Search products…"
+msgstr "Rechercher des produits…"
+
+msgid "Search products"
+msgstr "Rechercher des produits"
+
+msgid "Refresh"
+msgstr "Actualiser"
+
+msgid "Products"
+msgstr "Produits"
+
+msgid "&Install on pen"
+msgstr "&Installer sur le stylo"
+
+msgid "Install selected"
+msgstr "Installer la sélection"
+
+msgid "Loading…"
+msgstr "Chargement…"
+
+msgid "{n} product (offline — cached copy) · {path}"
+msgid_plural "{n} products (offline — cached copy) · {path}"
+msgstr[0] "{n} produit (hors ligne — copie en cache) · {path}"
+msgstr[1] "{n} produits (hors ligne — copie en cache) · {path}"
+
+msgid "{n} product · {path}"
+msgid_plural "{n} products · {path}"
+msgstr[0] "{n} produit · {path}"
+msgstr[1] "{n} produits · {path}"
+
+msgid "Detecting pen…"
+msgstr "Détection du stylo…"
+
+msgid "Mounting pen…"
+msgstr "Montage du stylo…"
+
+msgid "Pen mounted: {path}"
+msgstr "Stylo monté : {path}"
+
+msgid "Unmounting pen…"
+msgstr "Démontage du stylo…"
+
+msgid "Pen unmounted — safe to unplug"
+msgstr "Stylo démonté — retrait sans danger"
+
+msgid "Installing {name}…"
+msgstr "Installation de {name}…"
+
+msgid "Installed {name} — verified on the pen"
+msgstr "{name} installé — vérifié sur le stylo"
+
+msgid "{name} was installed and verified on the pen.\n\nClick Unmount before unplugging the pen."
+msgstr "{name} a été installé et vérifié sur le stylo.\n\nCliquez sur « Démonter » avant de débrancher le stylo."
+
+msgid "Delete these titles from the pen?\n\n{names}\n\nThe pen's trash will be emptied as well."
+msgstr "Supprimer ces titres du stylo ?\n\n{names}\n\nLa corbeille du stylo sera également vidée."
+
+msgid "Deleting {n} title…"
+msgid_plural "Deleting {n} titles…"
+msgstr[0] "Suppression de {n} titre…"
+msgstr[1] "Suppression de {n} titres…"
+
+msgid "Deleted {n} title, freed {size}"
+msgid_plural "Deleted {n} titles, freed {size}"
+msgstr[0] "{n} titre supprimé, {size} libérés"
+msgstr[1] "{n} titres supprimés, {size} libérés"
+
+msgid "Pen ready: {path}"
+msgstr "Stylo prêt : {path}"
+
+msgid "Pen disconnected"
+msgstr "Stylo déconnecté"
+
+msgid "Please wait until the pen operation finishes."
+msgstr "Veuillez attendre la fin de l'opération sur le stylo."
+
+msgid "error: the GUI requires PySide6 - install with: pip install tiptoi-linux[gui]"
+msgstr "erreur : l'interface graphique nécessite PySide6 - installez avec : pip install tiptoi-linux[gui]"
+
+msgid "refusing to follow redirect to non-https URL: {url}"
+msgstr "refus de suivre une redirection vers une URL non https : {url}"
+
+msgid "cannot read free space on pen at {path}: {error}"
+msgstr "impossible de lire l'espace libre du stylo dans {path} : {error}"
+
+msgid "pen mountpoint {path} is no longer mounted"
+msgstr "le point de montage {path} n'est plus monté"
+
+msgid "cannot fsync pen directory {path}: {error}"
+msgstr "impossible de synchroniser le répertoire du stylo {path} : {error}"
+
+msgid "--pen override {path} is not a directory"
+msgstr "le chemin --pen {path} n'est pas un répertoire"
+
+msgid "--pen override {path} points inside the protected folder {folder!r}"
+msgstr "le chemin --pen {path} pointe dans le dossier protégé {folder!r}"
+
+msgid "findmnt not found; install util-linux or pass --pen <path>"
+msgstr "findmnt introuvable ; installez util-linux ou utilisez --pen <chemin>"
+
+msgid "findmnt timed out while looking for the tiptoi pen"
+msgstr "expiration du délai de findmnt lors de la recherche du stylo tiptoi"
+
+msgid "findmnt failed (exit {code}): {error}"
+msgstr "échec de findmnt (code {code}) : {error}"
+
+msgid "could not parse findmnt output: {error}"
+msgstr "impossible d'analyser la sortie de findmnt : {error}"
+
+msgid "no tiptoi pen found (looked for a {label!r}-labelled vfat/exfat volume); mount it, or pass --pen <path> to point at it directly"
+msgstr "aucun stylo tiptoi trouvé (recherche d'un volume vfat/exfat nommé {label!r}) ; montez-le, ou utilisez --pen <chemin> pour le cibler directement"
+
+msgid "multiple tiptoi pens found: {mountpoints}; use --pen to pick one"
+msgstr "plusieurs stylos tiptoi trouvés : {mountpoints} ; utilisez --pen pour en choisir un"
+
+msgid "udisksctl not found; install udisks2 or (un)mount the pen in your file manager"
+msgstr "udisksctl introuvable ; installez udisks2 ou montez/démontez le stylo dans votre gestionnaire de fichiers"
+
+msgid "udisksctl timed out"
+msgstr "expiration du délai de udisksctl"
+
+msgid "udisksctl failed: {error}"
+msgstr "échec de udisksctl : {error}"
+
+msgid "no tiptoi pen is plugged in"
+msgstr "aucun stylo tiptoi n'est branché"
+
+msgid "this pen was chosen as a folder; unmount it in your file manager"
+msgstr "ce stylo a été choisi comme dossier ; démontez-le dans votre gestionnaire de fichiers"
+
+msgid "cannot read {path}: {error}"
+msgstr "impossible de lire {path} : {error}"
+
+msgid "refusing unsafe file name: {name!r}"
+msgstr "nom de fichier non sûr refusé : {name!r}"
+
+msgid "refusing to use non-{suffix} file name: {name!r}"
+msgstr "nom de fichier non {suffix} refusé : {name!r}"
+
+msgid "refusing to use protected file name: {name!r}"
+msgstr "nom de fichier protégé refusé : {name!r}"
+
+msgid "cannot stat source file {path}: {error}"
+msgstr "impossible d'analyser le fichier source {path} : {error}"
+
+msgid "not enough free space on pen: need {needed} bytes, have {available} bytes"
+msgstr "espace libre insuffisant sur le stylo : {needed} octets nécessaires, {available} disponibles"
+
+msgid "cannot create temp file for {name} in {path}: {error}"
+msgstr "impossible de créer un fichier temporaire pour {name} dans {path} : {error}"
+
+msgid "copy of {name} to the pen is incomplete: wrote {written} of {required} bytes"
+msgstr "la copie de {name} sur le stylo est incomplète : {written} octets écrits sur {required}"
+
+msgid "cannot install {name} onto pen: {error}"
+msgstr "impossible d'installer {name} sur le stylo : {error}"
+
+msgid "cannot open {name} on the pen to fsync after install: {error}"
+msgstr "impossible d'ouvrir {name} sur le stylo pour la synchronisation après installation : {error}"
+
+msgid "cannot fsync {name} on the pen after install: {error}"
+msgstr "impossible de synchroniser {name} sur le stylo après installation : {error}"
+
+msgid "cannot verify {name} on the pen: {error}"
+msgstr "impossible de vérifier {name} sur le stylo : {error}"
+
+msgid "verification failed for {name} on the pen: the data read back does not match"
+msgstr "échec de vérification de {name} sur le stylo : les données relues ne correspondent pas"
+
+msgid "(unknown)"
+msgstr "(inconnu)"
+
+msgid "{name}: installed {installed}, catalog {catalog}"
+msgstr "{name} : installé {installed}, catalogue {catalog}"
+
+msgid "cannot read pen mountpoint {path}: {error}"
+msgstr "impossible de lire le point de montage du stylo {path} : {error}"
+
+msgid "cannot empty pen trash directory {path}: {error}"
+msgstr "impossible de vider la corbeille du stylo {path} : {error}"
+
+msgid "{name} is not a title on the pen"
+msgstr "{name} n'est pas un titre sur le stylo"
+
+msgid "cannot delete {name} from the pen: {error}"
+msgstr "impossible de supprimer {name} du stylo : {error}"
+
+msgid "error: the GUI requires PySide6 - install with: pip install '.[gui]'"
+msgstr "erreur : l'interface graphique nécessite PySide6 - installez avec : pip install '.[gui]'"
+
+msgid "unofficial tiptoi Manager for Linux {version}"
+msgstr "Gestionnaire tiptoi non officiel pour Linux {version}"
+
+msgid "Search for a product name…"
+msgstr "Rechercher un nom de produit…"
+
+msgid "Install on pen"
+msgstr "Installer sur le stylo"
+
+msgid "Help and information"
+msgstr "Aide et informations"
+
+msgid "This is an unofficial, community-managed tool. It is not affiliated with or endorsed by Ravensburger. \"tiptoi\" is a trademark of Ravensburger AG."
+msgstr "Ceci est un outil communautaire non officiel. Il n'est ni affilié ni approuvé par Ravensburger. \"tiptoi\" est une marque de Ravensburger AG."
+
+msgid "unofficial tiptoi Manager"
+msgstr "Gestionnaire tiptoi non officiel"
+
+msgid "Refresh catalog"
+msgstr "Actualiser le catalogue"
+
+msgid "tiptoi FAQ"
+msgstr "FAQ tiptoi"
+
+msgid "Manual audio file download"
+msgstr "Téléchargement manuel des fichiers audio"
+
+msgid "tiptoi charging station"
+msgstr "station de charge tiptoi"
+
+msgid "tiptoi Wi-Fi pen"
+msgstr "stylo tiptoi Wi-Fi"
+
+msgid "Privacy"
+msgstr "Protection des données"
+
+msgid "Legal notice"
+msgstr "Mentions légales"
+
+msgid "Product catalog"
+msgstr "Catalogue des produits"
+
+msgid "The browsable catalog with categories and covers arrives with the next milestone."
+msgstr "Le catalogue navigable avec catégories et illustrations arrive dans la prochaine version."
+
+msgid "Audiobooks and songs"
+msgstr "Livres audio et chansons"
+
+msgid "Buying and licensing audiobooks requires a Ravensburger account and is not supported by this unofficial manager."
+msgstr "L'achat et la licence de livres audio nécessitent un compte Ravensburger et ne sont pas pris en charge par ce gestionnaire non officiel."
+
+msgid "Pen ready"
+msgstr "Stylo prêt"
+
+msgid "Catalog cached at {path}"
+msgstr "Catalogue en cache dans {path}"
+
+msgid "Delete these titles from the pen?\n\n{names}"
+msgstr "Supprimer ces titres du stylo ?\n\n{names}"
+
+msgid "Connected"
+msgstr "Connecté"
+
+msgid "Plugged in, not mounted"
+msgstr "Branché, non monté"
+
+msgid "Unmounted — safe to unplug"
+msgstr "Démonté — retrait sans danger"
+
+msgid "Load audio\nfiles"
+msgstr "Charger des\nfichiers audio"
+
+msgid "Browse product\ncatalog"
+msgstr "Parcourir le\ncatalogue"
+
+msgid "Buy audiobooks\nand songs"
+msgstr "Acheter livres\naudio et chansons"
+
+msgid "Manage pen\nand content"
+msgstr "Stylo et\ncontenus"
+
+msgid "Help and\ninformation"
+msgstr "Aide et\ninformations"
+
+msgid "Your pen"
+msgstr "Votre stylo"
+
+msgid "Not connected"
+msgstr "Non connecté"
+
+msgid "unofficial manager for Linux"
+msgstr "gestionnaire non officiel pour Linux"
+
+msgid "Options"
+msgstr "Options"
+
+msgid "Deleted {n} titles, freed {size}"
+msgstr "{n} titres supprimés, {size} libérés"
+
+msgid "Deleting {n} titles…"
+msgstr "Suppression de {n} titres…"
+
+msgid "{n} product (offline — cached copy)"
+msgid_plural "{n} products (offline — cached copy)"
+msgstr[0] "{n} produit (hors ligne — copie en cache)"
+msgstr[1] "{n} produits (hors ligne — copie en cache)"
+
+msgid "{n} product"
+msgid_plural "{n} products"
+msgstr[0] "{n} produit"
+msgstr[1] "{n} produits"
+
+msgid "Loading product covers…"
+msgstr "Chargement des illustrations…"
+
+msgid "failed to download the product portal page: {error}"
+msgstr "échec du téléchargement de la page du portail : {error}"
+
+msgid "the portal page response exceeds {max_bytes} bytes"
+msgstr "la réponse du portail dépasse {max_bytes} octets"
+
+msgid "the portal page listed no products; refusing to cache it"
+msgstr "la page du portail n'a listé aucun produit ; refus de la mettre en cache"
+
+msgid "failed to download cover {item}: {error}"
+msgstr "échec du téléchargement de l'illustration {item} : {error}"
+
+msgid "cover {item} has an unexpected size"
+msgstr "l'illustration {item} a une taille inattendue"
+
+msgid "cannot write firmware update to the pen: {error}"
+msgstr "impossible d'écrire la mise à jour du micrologiciel sur le stylo : {error}"
+
+msgid "Firmware"
+msgstr "Micrologiciel"
+
+msgid "Firmware-Version {version}"
+msgstr "Micrologiciel : version {version}"
+
+msgid "Unmount the pen, then switch it on to apply the update."
+msgstr "Démontez le stylo, puis allumez-le pour appliquer la mise à jour."
+
+msgid "All"
+msgstr "Tous"
+
+msgid "Search the catalog…"
+msgstr "Rechercher dans le catalogue…"
+
+msgid "Update all outdated titles"
+msgstr "Mettre à jour tous les titres périmés"
+
+msgid "All titles are up to date"
+msgstr "Tous les titres sont à jour"
+
+msgid "New version {version}"
+msgstr "Nouvelle version {version}"
+
+msgid "failed to check for a new version: {error}"
+msgstr "échec de la vérification de nouvelle version : {error}"
+
+msgid "unexpected release feed response"
+msgstr "réponse inattendue du flux de versions"
+
+msgid "unofficial tiptoi Manager for Linux {version}\n\nCommunity project based on tiptoi-linux by tokajer (GPL-3.0).\nThis program is not affiliated with or endorsed by Ravensburger; \"tiptoi\" is a trademark of Ravensburger AG."
+msgstr "Gestionnaire tiptoi non officiel pour Linux {version}\n\nProjet communautaire basé sur tiptoi-linux par tokajer (GPL-3.0).\nCe programme n'est ni affilié ni approuvé par Ravensburger ; \"tiptoi\" est une marque de Ravensburger AG."
+
+msgid "Version: {version}"
+msgstr "Version : {version}"
+
+msgid "New titles"
+msgstr "Nouveautés"

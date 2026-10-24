@@ -1,0 +1,659 @@
+# Dutch translations for tiptoi-manager-linux.
+# Based on the original tiptoi Manager wording where applicable.
+msgid ""
+msgstr ""
+"Project-Id-Version: tiptoi-manager-linux\n"
+"PO-Revision-Date: 2026-10-24 00:00+0200\n"
+"Last-Translator: tiptoi-manager-linux contributors\n"
+"Language-Team: Dutch\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "refusing unsafe product name: {name!r}"
+msgstr "onveilige productnaam geweigerd: {name!r}"
+
+msgid "refusing to download catalog over non-https URL: {url}"
+msgstr "downloaden van catalogus via niet-https-URL geweigerd: {url}"
+
+msgid "failed to download catalog from {url}: {error}"
+msgstr "downloaden van catalogus van {url} mislukt: {error}"
+
+msgid "catalog response from {url} exceeds {max_bytes} bytes"
+msgstr "catalogusantwoord van {url} overschrijdt {max_bytes} bytes"
+
+msgid "catalog downloaded from {url} has zero products; refusing to overwrite cache"
+msgstr "gedownloade catalogus van {url} bevat nul producten; cache overschrijven geweigerd"
+
+msgid "cannot write catalog cache at {path}: {error}"
+msgstr "kan cataloguscache niet schrijven naar {path}: {error}"
+
+msgid "cannot read catalog cache at {path}: {error}"
+msgstr "kan cataloguscache niet lezen uit {path}: {error}"
+
+msgid "{error}; no cached catalog available at {path}"
+msgstr "{error}; geen gecachete catalogus beschikbaar in {path}"
+
+msgid "Manage the tiptoi pen product catalog."
+msgstr "Beheer de productcatalogus van de tiptoi-pen."
+
+msgid "Force-refresh the cached catalog."
+msgstr "De gecachete catalogus geforceerd vernieuwen."
+
+msgid "List all products in the catalog."
+msgstr "Alle producten in de catalogus weergeven."
+
+msgid "Search products by name."
+msgstr "Producten zoeken op naam."
+
+msgid "Substring to search for (case-insensitive)."
+msgstr "Te zoeken tekenreeks (hoofdletterongevoelig)."
+
+msgid "Download a product's .gme file into the cache."
+msgstr "Het .gme-bestand van een product naar de cache downloaden."
+
+msgid "Exact product name, as shown by 'tiptoi list'."
+msgstr "Exacte productnaam, zoals getoond door 'tiptoi list'."
+
+msgid "Inspect or install onto a tiptoi pen."
+msgstr "Een tiptoi-pen inspecteren of iets installeren."
+
+msgid "Path to the pen's mountpoint, bypassing auto-detection."
+msgstr "Pad naar het mountpoint van de pen, zonder automatische detectie."
+
+msgid "Show the pen's mountpoint, free space, and titles."
+msgstr "Mountpoint, vrije ruimte en titels van de pen tonen."
+
+msgid "Mount the pen."
+msgstr "De pen koppelen."
+
+msgid "Unmount the pen so it can be unplugged."
+msgstr "De pen ontkoppelen zodat hij losgemaakt kan worden."
+
+msgid "Download (if needed) and install a title."
+msgstr "Een titel downloaden (indien nodig) en installeren."
+
+msgid "Validate and report what would be installed without writing to the pen."
+msgstr "Controleren en rapporteren wat geïnstalleerd zou worden, zonder naar de pen te schrijven."
+
+msgid "List installed titles with a newer catalog version."
+msgstr "Geïnstalleerde titels opsommen waarvoor een nieuwere versie bestaat."
+
+msgid "Delete titles from the pen and empty its trash."
+msgstr "Titels van de pen verwijderen en de prullenbak legen."
+
+msgid "On-pen file name(s), as shown by 'tiptoi pen status' (e.g. WN.gme)."
+msgstr "Bestandsna(a)m(en) op de pen, zoals getoond door 'tiptoi pen status' (bijv. WN.gme)."
+
+msgid "Delete without prompting for confirmation."
+msgstr "Verwijderen zonder verificatievraag."
+
+msgid "error: {message}"
+msgstr "fout: {message}"
+
+msgid "warning: {error} - using stale cached catalog at {path}"
+msgstr "waarschuwing: {error} - verouderde gecachete catalogus in {path} wordt gebruikt"
+
+msgid "Catalog updated: {n} product"
+msgid_plural "Catalog updated: {n} products"
+msgstr[0] "Catalogus bijgewerkt: {n} product"
+msgstr[1] "Catalogus bijgewerkt: {n} producten"
+
+msgid "Cache: {path}"
+msgstr "Cache: {path}"
+
+msgid "catalog is empty - run 'tiptoi update'"
+msgstr "catalogus is leeg - voer 'tiptoi update' uit"
+
+msgid "No products matching {term!r}"
+msgstr "Geen producten die overeenkomen met {term!r}"
+
+msgid "Downloading"
+msgstr "Bezig met downloaden"
+
+msgid "Copying to pen"
+msgstr "Kopiëren naar pen"
+
+msgid "Verifying on pen"
+msgstr "Verifiëren op pen"
+
+msgid "{n} bytes"
+msgstr "{n} bytes"
+
+msgid "no product named {name!r}"
+msgstr "geen product genaamd {name!r}"
+
+msgid "Mountpoint: {path}"
+msgstr "Mountpoint: {path}"
+
+msgid "Free space: {free} of {total}"
+msgstr "Vrije ruimte: {free} van {total}"
+
+msgid "Installed titles: none"
+msgstr "Geïnstalleerde titels: geen"
+
+msgid "Installed titles ({n}):"
+msgstr "Geïnstalleerde titels ({n}):"
+
+msgid "Mounted at {path}"
+msgstr "Gekoppeld aan {path}"
+
+msgid "Unmounted — the pen can be unplugged now"
+msgstr "Ontkoppeld — de pen kan nu losgemaakt worden"
+
+msgid "Would install {name} to {path}"
+msgstr "Zou {name} installeren naar {path}"
+
+msgid "Installed {name} to {path} ({size}, verified on the pen)"
+msgstr "{name} geïnstalleerd naar {path} ({size}, geverifieerd op de pen)"
+
+msgid "Run 'tiptoi pen unmount' before unplugging the pen."
+msgstr "Voer 'tiptoi pen unmount' uit voordat u de pen losmaakt."
+
+msgid "not installed on the pen: {names}"
+msgstr "niet geïnstalleerd op de pen: {names}"
+
+msgid "refusing to delete without confirmation; pass --yes"
+msgstr "verwijderen geweigerd zonder bevestiging; gebruik --yes"
+
+msgid "Titles to delete ({n}):"
+msgstr "Te verwijderen titels ({n}):"
+
+msgid "Delete {n} title from the pen and empty its trash? [y/N] "
+msgid_plural "Delete {n} titles from the pen and empty its trash? [y/N] "
+msgstr[0] "{n} titel van de pen verwijderen en prullenbak legen? [j/N] "
+msgstr[1] "{n} titels van de pen verwijderen en prullenbak legen? [j/N] "
+
+msgid "Deleted {name}"
+msgstr "{name} verwijderd"
+
+msgid "Freed {size}"
+msgstr "{size} vrijgegeven"
+
+msgid "All installed titles are up to date"
+msgstr "Alle geïnstalleerde titels zijn bijgewerkt"
+
+msgid "refusing non-.gme response ({content_type}) for {url}"
+msgstr "niet-.gme-antwoord geweigerd ({content_type}) voor {url}"
+
+msgid "refusing unverifiable response with no Content-Length for {url}"
+msgstr "niet-verifieerbaar antwoord zonder Content-Length geweigerd voor {url}"
+
+msgid "failed to download {url}: {error}"
+msgstr "downloaden van {url} mislukt: {error}"
+
+msgid "refusing to download product over non-https URL: {url}"
+msgstr "downloaden van product via niet-https-URL geweigerd: {url}"
+
+msgid "refusing unsafe product version: {version!r}"
+msgstr "onveilige productversie geweigerd: {version!r}"
+
+msgid "cannot create cache directory {path}: {error}"
+msgstr "kan cachemap {path} niet aanmaken: {error}"
+
+msgid "downloaded size {actual} for {url} does not match expected size {expected}"
+msgstr "gedownloade grootte {actual} voor {url} komt niet overeen met verwachte grootte {expected}"
+
+msgid "cannot finalize download for {url} at {path}: {error}"
+msgstr "kan download van {url} naar {path} niet afronden: {error}"
+
+msgid "On pen"
+msgstr "Op pen"
+
+msgid "Name"
+msgstr "Naam"
+
+msgid "Version"
+msgstr "Versie"
+
+msgid "Downloading…"
+msgstr "Bezig met downloaden…"
+
+msgid "Copying to pen…"
+msgstr "Kopiëren naar pen…"
+
+msgid "Verifying on pen…"
+msgstr "Verifiëren op pen…"
+
+msgid "○ Not connected"
+msgstr "○ Niet verbonden"
+
+msgid "○ Pen plugged in but not mounted — open it in your file manager"
+msgstr "○ Pen aangesloten maar niet gekoppeld — open hem in uw bestandsbeheerder"
+
+msgid "✓ Unmounted — safe to unplug"
+msgstr "✓ Ontkoppeld — veilig om los te maken"
+
+msgid "● Connected — {path}"
+msgstr "● Verbonden — {path}"
+
+msgid "On the &pen ({n})"
+msgstr "Op de &pen ({n})"
+
+msgid "&Outdated ({n})"
+msgstr "&Verouderd ({n})"
+
+msgid "On the pen"
+msgstr "Op de pen"
+
+msgid "unexpected error: {error}"
+msgstr "onverwachte fout: {error}"
+
+msgid "Pen storage"
+msgstr "Penopslag"
+
+msgid "&Detect pen"
+msgstr "Pen &detecteren"
+
+msgid "Detect pen"
+msgstr "Pen detecteren"
+
+msgid "&Choose folder…"
+msgstr "Map &kiezen…"
+
+msgid "Choose pen folder"
+msgstr "Pen-map kiezen"
+
+msgid "Titles on the pen"
+msgstr "Titels op de pen"
+
+msgid "Outdated titles"
+msgstr "Verouderde titels"
+
+msgid "De&lete selected"
+msgstr "Selectie &verwijderen"
+
+msgid "Delete selected titles from the pen"
+msgstr "Geselecteerde titels van de pen verwijderen"
+
+msgid "Storage"
+msgstr "Opslag"
+
+msgid "{free} free of {total}"
+msgstr "{free} vrij van {total}"
+
+msgid "Task progress"
+msgstr "Taakvoortgang"
+
+msgid "Pen connection"
+msgstr "Penverbinding"
+
+msgid "&Mount"
+msgstr "&Koppelen"
+
+msgid "Mount the pen"
+msgstr "De pen koppelen"
+
+msgid "&Unmount"
+msgstr "&Ontkoppelen"
+
+msgid "Unmount the pen so it can be unplugged"
+msgstr "De pen ontkoppelen zodat hij losgemaakt kan worden"
+
+msgid "&Search:"
+msgstr "&Zoeken:"
+
+msgid "Search products…"
+msgstr "Producten zoeken…"
+
+msgid "Search products"
+msgstr "Producten zoeken"
+
+msgid "Refresh"
+msgstr "Vernieuwen"
+
+msgid "Products"
+msgstr "Producten"
+
+msgid "&Install on pen"
+msgstr "&Installeren op pen"
+
+msgid "Install selected"
+msgstr "Selectie installeren"
+
+msgid "Loading…"
+msgstr "Laden…"
+
+msgid "{n} product (offline — cached copy) · {path}"
+msgid_plural "{n} products (offline — cached copy) · {path}"
+msgstr[0] "{n} product (offline — gecachete kopie) · {path}"
+msgstr[1] "{n} producten (offline — gecachete kopie) · {path}"
+
+msgid "{n} product · {path}"
+msgid_plural "{n} products · {path}"
+msgstr[0] "{n} product · {path}"
+msgstr[1] "{n} producten · {path}"
+
+msgid "Detecting pen…"
+msgstr "Pen detecteren…"
+
+msgid "Mounting pen…"
+msgstr "Pen koppelen…"
+
+msgid "Pen mounted: {path}"
+msgstr "Pen gekoppeld: {path}"
+
+msgid "Unmounting pen…"
+msgstr "Pen ontkoppelen…"
+
+msgid "Pen unmounted — safe to unplug"
+msgstr "Pen ontkoppeld — veilig om los te maken"
+
+msgid "Installing {name}…"
+msgstr "{name} installeren…"
+
+msgid "Installed {name} — verified on the pen"
+msgstr "{name} geïnstalleerd — geverifieerd op de pen"
+
+msgid "{name} was installed and verified on the pen.\n\nClick Unmount before unplugging the pen."
+msgstr "{name} is geïnstalleerd en geverifieerd op de pen.\n\nKlik op « Ontkoppelen » voordat u de pen losmaakt."
+
+msgid "Delete these titles from the pen?\n\n{names}\n\nThe pen's trash will be emptied as well."
+msgstr "Deze titels van de pen verwijderen?\n\n{names}\n\nDe prullenbak van de pen wordt ook geleegd."
+
+msgid "Deleting {n} title…"
+msgid_plural "Deleting {n} titles…"
+msgstr[0] "{n} titel verwijderen…"
+msgstr[1] "{n} titels verwijderen…"
+
+msgid "Deleted {n} title, freed {size}"
+msgid_plural "Deleted {n} titles, freed {size}"
+msgstr[0] "{n} titel verwijderd, {size} vrijgegeven"
+msgstr[1] "{n} titels verwijderd, {size} vrijgegeven"
+
+msgid "Pen ready: {path}"
+msgstr "Pen gereed: {path}"
+
+msgid "Pen disconnected"
+msgstr "Pen losgekoppeld"
+
+msgid "Please wait until the pen operation finishes."
+msgstr "Wacht tot de penbewerking is voltooid."
+
+msgid "error: the GUI requires PySide6 - install with: pip install tiptoi-linux[gui]"
+msgstr "fout: de GUI vereist PySide6 - installeer met: pip install tiptoi-linux[gui]"
+
+msgid "refusing to follow redirect to non-https URL: {url}"
+msgstr "redirect naar niet-https-URL geweigerd: {url}"
+
+msgid "cannot read free space on pen at {path}: {error}"
+msgstr "kan vrije ruimte op pen niet lezen in {path}: {error}"
+
+msgid "pen mountpoint {path} is no longer mounted"
+msgstr "pen-mountpoint {path} is niet meer gekoppeld"
+
+msgid "cannot fsync pen directory {path}: {error}"
+msgstr "kan penmap {path} niet synchroniseren: {error}"
+
+msgid "--pen override {path} is not a directory"
+msgstr "--pen-pad {path} is geen map"
+
+msgid "--pen override {path} points inside the protected folder {folder!r}"
+msgstr "--pen-pad {path} wijst naar de beschermde map {folder!r}"
+
+msgid "findmnt not found; install util-linux or pass --pen <path>"
+msgstr "findmnt niet gevonden; installeer util-linux of gebruik --pen <pad>"
+
+msgid "findmnt timed out while looking for the tiptoi pen"
+msgstr "time-out van findmnt tijdens zoeken naar de tiptoi-pen"
+
+msgid "findmnt failed (exit {code}): {error}"
+msgstr "findmnt mislukt (code {code}): {error}"
+
+msgid "could not parse findmnt output: {error}"
+msgstr "kan uitvoer van findmnt niet verwerken: {error}"
+
+msgid "no tiptoi pen found (looked for a {label!r}-labelled vfat/exfat volume); mount it, or pass --pen <path> to point at it directly"
+msgstr "geen tiptoi-pen gevonden (zocht een vfat/exfat-volume met label {label!r}); koppel het aan, of gebruik --pen <pad> om het direct aan te wijzen"
+
+msgid "multiple tiptoi pens found: {mountpoints}; use --pen to pick one"
+msgstr "meerdere tiptoi-pens gevonden: {mountpoints}; gebruik --pen om er één te kiezen"
+
+msgid "udisksctl not found; install udisks2 or (un)mount the pen in your file manager"
+msgstr "udisksctl niet gevonden; installeer udisks2 of koppel de pen aan/los in uw bestandsbeheerder"
+
+msgid "udisksctl timed out"
+msgstr "time-out van udisksctl"
+
+msgid "udisksctl failed: {error}"
+msgstr "udisksctl mislukt: {error}"
+
+msgid "no tiptoi pen is plugged in"
+msgstr "er is geen tiptoi-pen aangesloten"
+
+msgid "this pen was chosen as a folder; unmount it in your file manager"
+msgstr "deze pen is als map gekozen; ontkoppel hem in uw bestandsbeheerder"
+
+msgid "cannot read {path}: {error}"
+msgstr "kan {path} niet lezen: {error}"
+
+msgid "refusing unsafe file name: {name!r}"
+msgstr "onveilige bestandsnaam geweigerd: {name!r}"
+
+msgid "refusing to use non-{suffix} file name: {name!r}"
+msgstr "niet-{suffix}-bestandsnaam geweigerd: {name!r}"
+
+msgid "refusing to use protected file name: {name!r}"
+msgstr "beschermde bestandsnaam geweigerd: {name!r}"
+
+msgid "cannot stat source file {path}: {error}"
+msgstr "kan bronbestand {path} niet analyseren: {error}"
+
+msgid "not enough free space on pen: need {needed} bytes, have {available} bytes"
+msgstr "te weinig vrije ruimte op pen: {needed} bytes nodig, {available} beschikbaar"
+
+msgid "cannot create temp file for {name} in {path}: {error}"
+msgstr "kan tijdelijk bestand voor {name} in {path} niet aanmaken: {error}"
+
+msgid "copy of {name} to the pen is incomplete: wrote {written} of {required} bytes"
+msgstr "kopie van {name} naar de pen is onvolledig: {written} van {required} bytes geschreven"
+
+msgid "cannot install {name} onto pen: {error}"
+msgstr "kan {name} niet op pen installeren: {error}"
+
+msgid "cannot open {name} on the pen to fsync after install: {error}"
+msgstr "kan {name} op pen niet openen om te synchroniseren na installatie: {error}"
+
+msgid "cannot fsync {name} on the pen after install: {error}"
+msgstr "kan {name} op pen niet synchroniseren na installatie: {error}"
+
+msgid "cannot verify {name} on the pen: {error}"
+msgstr "kan {name} niet verifiëren op de pen: {error}"
+
+msgid "verification failed for {name} on the pen: the data read back does not match"
+msgstr "verificatie van {name} op de pen mislukt: de teruggelezen data komt niet overeen"
+
+msgid "(unknown)"
+msgstr "(onbekend)"
+
+msgid "{name}: installed {installed}, catalog {catalog}"
+msgstr "{name}: geïnstalleerd {installed}, catalogus {catalog}"
+
+msgid "cannot read pen mountpoint {path}: {error}"
+msgstr "kan pen-mountpoint {path} niet lezen: {error}"
+
+msgid "cannot empty pen trash directory {path}: {error}"
+msgstr "kan pen-prullenbak {path} niet legen: {error}"
+
+msgid "{name} is not a title on the pen"
+msgstr "{name} is geen titel op de pen"
+
+msgid "cannot delete {name} from the pen: {error}"
+msgstr "kan {name} niet van de pen verwijderen: {error}"
+
+msgid "error: the GUI requires PySide6 - install with: pip install '.[gui]'"
+msgstr "fout: de GUI vereist PySide6 - installeer met: pip install '.[gui]'"
+
+msgid "unofficial tiptoi Manager for Linux {version}"
+msgstr "onofficiële tiptoi Manager voor Linux {version}"
+
+msgid "Search for a product name…"
+msgstr "Zoek een productnaam…"
+
+msgid "Install on pen"
+msgstr "Op pen installeren"
+
+msgid "Help and information"
+msgstr "Hulp en informatie"
+
+msgid "This is an unofficial, community-managed tool. It is not affiliated with or endorsed by Ravensburger. \"tiptoi\" is a trademark of Ravensburger AG."
+msgstr "Dit is een onofficieel, community-beheerd hulpmiddel. Het is niet verbonden met of goedgekeurd door Ravensburger. \"tiptoi\" is een handelsmerk van Ravensburger AG."
+
+msgid "unofficial tiptoi Manager"
+msgstr "onofficiële tiptoi Manager"
+
+msgid "Refresh catalog"
+msgstr "Catalogus vernieuwen"
+
+msgid "tiptoi FAQ"
+msgstr "tiptoi-veelgestelde vragen"
+
+msgid "Manual audio file download"
+msgstr "Audiodateiën handmatig downloaden"
+
+msgid "tiptoi charging station"
+msgstr "tiptoi-oplaadstation"
+
+msgid "tiptoi Wi-Fi pen"
+msgstr "tiptoi-pen met wifi"
+
+msgid "Privacy"
+msgstr "Privacy"
+
+msgid "Legal notice"
+msgstr "Voorwaarden"
+
+msgid "Product catalog"
+msgstr "Productcatalogus"
+
+msgid "The browsable catalog with categories and covers arrives with the next milestone."
+msgstr "De bladerbare catalogus met categorieën en omslagen komt met de volgende versie."
+
+msgid "Audiobooks and songs"
+msgstr "Audioboeken en liedjes"
+
+msgid "Buying and licensing audiobooks requires a Ravensburger account and is not supported by this unofficial manager."
+msgstr "Audioboeken kopen en licenseren vereist een Ravensburger-account en wordt niet ondersteund door deze onofficiële manager."
+
+msgid "Pen ready"
+msgstr "Pen gereed"
+
+msgid "Catalog cached at {path}"
+msgstr "Catalogus gecachet in {path}"
+
+msgid "Delete these titles from the pen?\n\n{names}"
+msgstr "Deze titels van de pen verwijderen?\n\n{names}"
+
+msgid "Connected"
+msgstr "Verbonden"
+
+msgid "Plugged in, not mounted"
+msgstr "Aangesloten, niet gekoppeld"
+
+msgid "Unmounted — safe to unplug"
+msgstr "Ontkoppeld — veilig om los te maken"
+
+msgid "Load audio\nfiles"
+msgstr "Audiobestanden\nladen"
+
+msgid "Browse product\ncatalog"
+msgstr "Productcatalogus\nbladeren"
+
+msgid "Buy audiobooks\nand songs"
+msgstr "Audioboeken en\nliedjes kopen"
+
+msgid "Manage pen\nand content"
+msgstr "Pen en inhoud\nbeheren"
+
+msgid "Help and\ninformation"
+msgstr "Hulp en\ninformatie"
+
+msgid "Your pen"
+msgstr "Uw pen"
+
+msgid "Not connected"
+msgstr "Niet verbonden"
+
+msgid "unofficial manager for Linux"
+msgstr "onofficiële manager voor Linux"
+
+msgid "Options"
+msgstr "Opties"
+
+msgid "Deleted {n} titles, freed {size}"
+msgstr "{n} titels verwijderd, {size} vrijgegeven"
+
+msgid "Deleting {n} titles…"
+msgstr "{n} titels verwijderen…"
+
+msgid "{n} product (offline — cached copy)"
+msgid_plural "{n} products (offline — cached copy)"
+msgstr[0] "{n} product (offline — gecachete kopie)"
+msgstr[1] "{n} producten (offline — gecachete kopie)"
+
+msgid "{n} product"
+msgid_plural "{n} products"
+msgstr[0] "{n} product"
+msgstr[1] "{n} producten"
+
+msgid "Loading product covers…"
+msgstr "Omslagen laden…"
+
+msgid "failed to download the product portal page: {error}"
+msgstr "downloaden van de portelpagina mislukt: {error}"
+
+msgid "the portal page response exceeds {max_bytes} bytes"
+msgstr "het portelantwoord overschrijdt {max_bytes} bytes"
+
+msgid "the portal page listed no products; refusing to cache it"
+msgstr "de portelpagina bevatte geen producten; cachen geweigerd"
+
+msgid "failed to download cover {item}: {error}"
+msgstr "downloaden van omslag {item} mislukt: {error}"
+
+msgid "cover {item} has an unexpected size"
+msgstr "omslag {item} heeft een onverwachte grootte"
+
+msgid "cannot write firmware update to the pen: {error}"
+msgstr "kan firmware-update niet naar de pen schrijven: {error}"
+
+msgid "Firmware"
+msgstr "Firmware"
+
+msgid "Firmware-Version {version}"
+msgstr "Firmwareversie {version}"
+
+msgid "Unmount the pen, then switch it on to apply the update."
+msgstr "Koppel de pen los en schakel hem in om de update toe te passen."
+
+msgid "All"
+msgstr "Alle"
+
+msgid "Search the catalog…"
+msgstr "Catalogus doorzoeken…"
+
+msgid "Update all outdated titles"
+msgstr "Alle verouderde titels bijwerken"
+
+msgid "All titles are up to date"
+msgstr "Alle titels zijn bijgewerkt"
+
+msgid "New version {version}"
+msgstr "Nieuwe versie {version}"
+
+msgid "failed to check for a new version: {error}"
+msgstr "controle op nieuwe versie mislukt: {error}"
+
+msgid "unexpected release feed response"
+msgstr "onverwacht antwoord van releasefeed"
+
+msgid "unofficial tiptoi Manager for Linux {version}\n\nCommunity project based on tiptoi-linux by tokajer (GPL-3.0).\nThis program is not affiliated with or endorsed by Ravensburger; \"tiptoi\" is a trademark of Ravensburger AG."
+msgstr "onofficiële tiptoi Manager voor Linux {version}\n\nCommunityproject gebaseerd op tiptoi-linux van tokajer (GPL-3.0).\nDit programma is niet verbonden met of goedgekeurd door Ravensburger; \"tiptoi\" is een handelsmerk van Ravensburger AG."
+
+msgid "Version: {version}"
+msgstr "Versie: {version}"
+
+msgid "New titles"
+msgstr "Nieuw"

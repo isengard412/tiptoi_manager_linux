@@ -314,6 +314,9 @@ class TiptoiWindow(QMainWindow):
             ("system", _("System default")),
             ("de", "Deutsch"),
             ("en", "English"),
+            ("fr", "Français"),
+            ("it", "Italiano"),
+            ("nl", "Nederlands"),
         ):
             action = language_menu.addAction(label)
             action.setCheckable(True)
