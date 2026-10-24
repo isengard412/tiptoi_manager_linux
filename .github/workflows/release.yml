@@ -178,7 +178,7 @@ jobs:
             if [ "$PRERELEASE" = "true" ]; then flags+=(--prerelease); fi
             gh release create "$TAG" "$asset" SHA256SUMS \
               --target "$GITHUB_SHA" \
-              --title "tiptoi-linux ${VERSION}" \
+              --title "unofficial tiptoi Manager for Linux ${VERSION}" \
               --generate-notes \
               "${flags[@]}"
           fi
