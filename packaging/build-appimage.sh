@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly BASE_APPIMAGE_URL="https://github.com/niess/python-appimage/releases/download/python3.12/python3.12.14-cp312-cp312-manylinux_2_28_x86_64.AppImage"
-readonly BASE_APPIMAGE_SHA256="cefdd1b6e08dfb6c977d4233a4177ed3ee55a526991a122c8d92263f5901544f"
+# NOTE: the "python3.12" release tag is a ROLLING target - upstream replaces its assets on
+# every Python point release, so an old pin eventually 404s. When that happens, update the
+# file name and SHA256 below from the release API ("digest" field of the asset) - the build
+# re-verifies the checksum, so a bad copy can never slip through.
+readonly BASE_APPIMAGE_URL="https://github.com/niess/python-appimage/releases/download/python3.12/python3.12.15-cp312-cp312-manylinux_2_28_x86_64.AppImage"
+readonly BASE_APPIMAGE_SHA256="929ce69b45955bfc74af81fd65a65c3ad240593c99b3574466a94ebf0f987ebf"
 readonly APPIMAGETOOL_URL="https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-x86_64.AppImage"
 readonly APPIMAGETOOL_SHA256="ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0"
 readonly PYSIDE6_VERSION="6.11.2"
