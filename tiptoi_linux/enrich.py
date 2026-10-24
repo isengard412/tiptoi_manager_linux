@@ -29,7 +29,7 @@ MAX_COVER_BYTES = 2 * 1024 * 1024
 
 _ITEM_SUFFIX_RE = re.compile(r"^(?P<name>.+?)_(?P<item>\d{5})$")
 _LINK_RE = re.compile(
-    r'<a[^>]*href="[^"]*tiptoi%C2%AE_Audiodateien/(([^"#?]*)/)?[^"#?]*?/([^"#?]+)"[^>]*>(.*?)</a>',
+    r'<a[^>]*href="[^"]*tiptoi%C2%AE_Audiodateien/([^"#?]+)"[^>]*>(.*?)</a>',
     re.IGNORECASE | re.DOTALL,
 )
 _TAG_RE = re.compile(r"<[^>]+>")
@@ -83,6 +83,8 @@ class PortalIndex:
 
     items: dict[str, str]
     compact: dict[str, str] = field(default_factory=dict)
+    # article number -> portal tree section ("Bücher", "Puzzle", ...); drives the catalog filter bar
+    categories: dict[str, str] = field(default_factory=dict)
 
     @property
     def size(self) -> int:
@@ -155,16 +157,28 @@ def parse_portal_links(html: str) -> PortalIndex:
     name and the page slug's trailing five-digit number for the article number.
     """
     items: dict[str, str] = {}
-    for raw_slug, raw_text in _LINK_RE.findall(html):
-        slug = urllib.parse.unquote(raw_slug.rsplit("/", 1)[-1])
+    categories: dict[str, str] = {}
+    for raw_path, raw_text in _LINK_RE.findall(html):
+        segments = [s for s in raw_path.split("/") if s]
+        if not segments:
+            continue
+        raw_slug = segments[-1]
+        slug = urllib.parse.unquote(raw_slug)
         match = _ITEM_SUFFIX_RE.match(slug)
         if not match:
             continue
         name = normalize_name(_clean_anchor_text(raw_text))
-        if name:
-            items.setdefault(name, match.group("item"))
+        if not name:
+            continue
+        items.setdefault(name, match.group("item"))
+        if len(segments) >= 2:  # the parent segment is the portal's category section
+            raw = urllib.parse.unquote(segments[-2]).replace("_", " ").strip()
+            raw = re.sub(r"(?i)^(?:audiodateien?|audioatei)\s+", "", raw)
+            raw = re.sub(r"(?i)^tiptoi\s*®?\s*", "", raw).strip()
+            if raw:
+                categories.setdefault(match.group("item"), raw)
     compact = {name.replace(" ", ""): item for name, item in items.items()}
-    return PortalIndex(items, compact)
+    return PortalIndex(items, compact, categories)
 
 
 def cover_url(item: str) -> str:

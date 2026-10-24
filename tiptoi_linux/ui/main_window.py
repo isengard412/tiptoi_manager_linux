@@ -43,6 +43,7 @@ from tiptoi_linux.gui import (
 from tiptoi_linux.i18n import _, ngettext
 from tiptoi_linux.pen import FIRMWARE_FILE_NAME, Pen, PenSummary, Phase, read_pen_log
 from tiptoi_linux.streams import percent
+from tiptoi_linux.ui import catalog as catalog_screen_module
 from tiptoi_linux.ui import theme, tiles, widgets
 
 T = TypeVar("T")
@@ -226,6 +227,17 @@ class TiptoiWindow(QMainWindow):
         )
         self.download_screen.grid.doubleClicked.connect(self._on_grid_double_clicked)
 
+        self.catalog_screen = catalog_screen_module.CatalogScreen()
+        self._catalog_proxy = catalog_screen_module.CatalogProxy(self)
+        self.catalog_screen.use_model(self._model, self._catalog_proxy)
+        self.catalog_screen.install_button.clicked.connect(self._start_install_catalog_selected)
+        self.catalog_screen.on_selection_changed = self._update_install_button_enabled
+        self.catalog_screen.grid.doubleClicked.connect(
+            lambda _index: self._start_install_catalog_selected()
+            if self.catalog_screen.install_button.isEnabled()
+            else None
+        )
+
         self.pen_panel = PenPanel()
         self.pen_panel.detect_button.clicked.connect(lambda: self._detect())
         self.pen_panel.choose_button.clicked.connect(self._choose_pen_folder)
@@ -241,12 +253,7 @@ class TiptoiWindow(QMainWindow):
 
         self._stack = QStackedWidget()
         self._stack.addWidget(self.download_screen)
-        self._stack.addWidget(
-            PlaceholderScreen(
-                _("Product catalog"),
-                _("The browsable catalog with categories and covers arrives with the next milestone."),
-            )
-        )
+        self._stack.addWidget(self.catalog_screen)
         self._stack.addWidget(
             PlaceholderScreen(
                 _("Audiobooks and songs"),
@@ -399,12 +406,18 @@ class TiptoiWindow(QMainWindow):
                     pass
                 done += 1
                 progress(Phase.DOWNLOAD, done, len(mapping))
-            return mapping
+            return mapping, index
 
-        def succeeded(mapping) -> None:
+        def succeeded(outcome) -> None:
             self._progress_bar.setVisible(False)
+            if not outcome:
+                return
+            mapping, index = outcome
             if mapping:
                 self._model.set_items(mapping)
+                categories = sorted(set(index.categories.values()))
+                self.catalog_screen.set_categories(categories)
+                self._catalog_proxy.set_mapping(mapping, index.categories)
 
         def failed(message: str) -> None:
             self._progress_bar.setVisible(False)
@@ -448,6 +461,8 @@ class TiptoiWindow(QMainWindow):
     def _update_install_button_enabled(self) -> None:
         has_selection = bool(self.download_screen.grid.selectionModel().selectedIndexes())
         self.download_screen.install_button.setEnabled(self._pen_idle() and has_selection)
+        catalog_selection = bool(self.catalog_screen.grid.selectionModel().selectedIndexes())
+        self.catalog_screen.install_button.setEnabled(self._pen_idle() and catalog_selection)
 
     def _update_delete_button_enabled(self) -> None:
         has_selection = bool(self.pen_panel.installed_list.selectedItems())
@@ -539,8 +554,13 @@ class TiptoiWindow(QMainWindow):
             self._show_error(message)
 
     def _start_install_selected(self) -> None:
+        self._install_product(self._selected_product())
+
+    def _start_install_catalog_selected(self) -> None:
+        self._install_product(self.catalog_screen.selected_product())
+
+    def _install_product(self, product: Product | None) -> None:
         pen = self._pen()
-        product = self._selected_product()
         if pen is None or product is None:
             return
         services = self._services

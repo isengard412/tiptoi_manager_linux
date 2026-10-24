@@ -182,6 +182,22 @@ def build_style_sheet() -> str:
     QListView#productGrid::item {{ border: none; }}
     QListView#productGrid::item:selected {{ background: {HEADER_ORANGE_SOFT}; border-radius: 10px; }}
 
+    QPushButton#CategoryChip {{
+        background: {BG_WHITE};
+        border: 1px solid {BORDER_LIGHT};
+        border-radius: 14px;
+        padding: 4px 14px;
+        font-size: 12px;
+        font-weight: 600;
+        color: {FRAME_TEAL};
+    }}
+    QPushButton#CategoryChip:hover {{ border-color: {BRAND_ORANGE}; }}
+    QPushButton#CategoryChip:checked {{
+        background: {BRAND_ORANGE};
+        border-color: {BRAND_ORANGE};
+        color: {BG_WHITE};
+    }}
+
     /* --- storage / progress bars -------------------------------------- */
     QProgressBar {{
         border: none;

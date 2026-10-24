@@ -983,3 +983,9 @@ msgid "Staged firmware {version} on the pen."
 msgstr "Firmware {version} wurde auf dem Stift vorbereitet."
 msgid "Unmount the pen, then switch it on to apply the update."
 msgstr "Hängen Sie den Stift aus und schalten Sie ihn ein, um das Update anzuwenden."
+
+msgid "All"
+msgstr "Alle"
+
+msgid "Search the catalog…"
+msgstr "Produktkatalog durchsuchen…"
