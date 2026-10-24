@@ -13,15 +13,20 @@ from tiptoi_linux.download import download_product
 from tiptoi_linux.errors import TiptoiError
 from tiptoi_linux.i18n import _, ngettext
 from tiptoi_linux.pen import (
+    FIRMWARE_FILE_NAME,
     Phase,
     PhaseProgress,
     delete_title,
+    download_firmware,
     find_pen,
+    install_firmware,
     install_title,
     installed_gme_files,
     mount_pen,
     outdated_titles,
+    parse_firmware_info,
     pen_summary,
+    read_pen_log,
     unmount_pen,
 )
 from tiptoi_linux.streams import Progress, percent
@@ -96,6 +101,17 @@ def _build_parser() -> argparse.ArgumentParser:
         "--yes", action="store_true", help=_("Delete without prompting for confirmation.")
     )
     pen_delete_parser.set_defaults(func=_cmd_pen_delete)
+
+    pen_firmware_parser = pen_subparsers.add_parser(
+        "firmware", help=_("Show the pen's firmware and the latest catalog version.")
+    )
+    pen_firmware_parser.add_argument(
+        "--install", action="store_true", help=_("Download and stage the latest firmware on the pen.")
+    )
+    pen_firmware_parser.add_argument(
+        "--yes", action="store_true", help=_("Install without prompting for confirmation.")
+    )
+    pen_firmware_parser.set_defaults(func=_cmd_pen_firmware)
 
     return parser
 
@@ -330,6 +346,70 @@ def _cmd_pen_outdated(args: argparse.Namespace) -> int:
         return 0
     for title in titles:
         print(title.describe())
+    return 0
+
+
+def _pen_firmware_version(pen) -> str | None:
+    fields = read_pen_log(pen)
+    for key, value in fields.items():
+        if key.casefold() in ("firmwareversion", "firmware", "fw", "version") and value:
+            return value
+    return None
+
+
+def _catalog_firmware_info():
+    try:
+        text = cache_path().read_text(encoding="latin-1")
+    except OSError:
+        return None
+    return parse_firmware_info(text)
+
+
+def _cmd_pen_firmware(args: argparse.Namespace) -> int:
+    pen = find_pen(override=args.pen_path)
+    current = _pen_firmware_version(pen)
+    info = _catalog_firmware_info()
+
+    serial = read_pen_log(pen).get("serialNumber") or read_pen_log(pen).get("serial")
+    if serial:
+        print(_("tiptoi® pen {serial}").format(serial=serial))
+    print(_("Pen firmware: {version}").format(version=current or _("(unknown)")))
+    if info is None:
+        print(_("No firmware information in the catalog; run 'tiptoi update'."))
+        return 0
+    print(_("Latest firmware: {version}").format(version=info.version))
+
+    if (pen.mountpoint / FIRMWARE_FILE_NAME).exists():
+        print(_("A firmware update is already pending on the pen."))
+        return 0
+
+    if current == info.version:
+        print(_("The pen is up to date."))
+        return 0
+    if not args.install:
+        print(_("Run 'tiptoi pen firmware --install' to stage the update."))
+        return 0
+
+    if not args.yes and not sys.stdin.isatty():
+        _print_error(_("refusing to install without confirmation; pass --yes"))
+        return 1
+    if not args.yes:
+        # WHY: y/yes parsed by code, kept untranslated like the delete prompt
+        answer = input(_("Download and stage firmware {version}? [y/N] ").format(version=info.version)).strip().lower()
+        if answer not in ("y", "yes"):
+            print(_("Cancelled."))
+            return 0
+
+    def progress(phase: Phase, done: int, total: int | None) -> None:
+        if total:
+            sys.stderr.write(f"\r{_('Downloading firmware update…')} {percent(done, total)}%")
+            sys.stderr.flush()
+
+    path = download_firmware(info, progress=progress)
+    sys.stderr.write("\n")
+    install_firmware(pen, path, info=info)
+    print(_("Staged firmware {version} on the pen.").format(version=info.version))
+    print(_("Unmount the pen, then switch it on to apply the update."))
     return 0
 
 

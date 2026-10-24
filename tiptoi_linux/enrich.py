@@ -29,7 +29,7 @@ MAX_COVER_BYTES = 2 * 1024 * 1024
 
 _ITEM_SUFFIX_RE = re.compile(r"^(?P<name>.+?)_(?P<item>\d{5})$")
 _LINK_RE = re.compile(
-    r'<a[^>]*href="[^"]*tiptoi%C2%AE_Audiodateien/[^"]*?/([^"#?]+)"[^>]*>(.*?)</a>',
+    r'<a[^>]*href="[^"]*tiptoi%C2%AE_Audiodateien/(([^"#?]*)/)?[^"#?]*?/([^"#?]+)"[^>]*>(.*?)</a>',
     re.IGNORECASE | re.DOTALL,
 )
 _TAG_RE = re.compile(r"<[^>]+>")

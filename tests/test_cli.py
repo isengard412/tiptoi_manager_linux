@@ -102,6 +102,72 @@ class PenStatusTests(unittest.TestCase):
         self.assertIn("  WN.gme", out)
 
 
+class PenFirmwareTests(unittest.TestCase):
+    INFO = None  # set in setUp to a FirmwareInfo
+
+    def setUp(self) -> None:
+        from tiptoi_linux.pen import FirmwareInfo
+
+        self.info = FirmwareInfo(version="6GE027", checksum=1, url="https://x/Update6E.upd")
+        self.logs = {"serialNumber": "123456", "firmwareversion": "6GE020"}
+
+    def _patches(self, *, pen=None, pending: bool = False):
+        import contextlib
+
+        stack = contextlib.ExitStack()
+        stack.enter_context(patch.object(cli, "find_pen", return_value=pen or PEN))
+        stack.enter_context(patch.object(cli, "read_pen_log", return_value=self.logs))
+        stack.enter_context(patch.object(cli, "_catalog_firmware_info", return_value=self.info))
+        if pending:
+            (pen.mountpoint / cli.FIRMWARE_FILE_NAME).write_bytes(b"pending")
+        return stack
+
+    def test_reports_versions_and_hint(self) -> None:
+        with self._patches():
+            code, out, _err = _run(["pen", "firmware"])
+        self.assertEqual(code, 0)
+        self.assertIn("123456", out)
+        self.assertIn("6GE020", out)
+        self.assertIn("6GE027", out)
+        self.assertIn("--install", out)
+
+    def test_up_to_date(self) -> None:
+        self.logs["firmwareversion"] = "6GE027"
+        with self._patches():
+            code, out, _err = _run(["pen", "firmware"])
+        self.assertEqual(code, 0)
+        self.assertIn("up to date", out.lower())
+
+    def test_pending_update_reported(self) -> None:
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as tmp:
+            pen = Pen(mountpoint=Path(tmp), source=None)
+            with self._patches(pen=pen, pending=True):
+                code, out, _err = _run(["pen", "firmware"])
+            self.assertEqual(code, 0)
+            self.assertIn("pending", out.lower())
+
+    def test_install_with_yes(self) -> None:
+        with (
+            self._patches(),
+            patch.object(cli, "download_firmware", return_value=Path("/tmp/fw.upd")) as dl,
+            patch.object(cli, "install_firmware") as inst,
+        ):
+            code, out, _err = _run(["pen", "firmware", "--install", "--yes"])
+        self.assertEqual(code, 0)
+        dl.assert_called_once()
+        inst.assert_called_once()
+        self.assertIn("6GE027", out)
+
+    def test_non_tty_requires_yes(self) -> None:
+        with self._patches():
+            code, _out, err = _run(["pen", "firmware", "--install"], stdin_tty=False)
+        self.assertEqual(code, 1)
+        self.assertIn("--yes", err)
+
+
 class StaleCatalogTests(unittest.TestCase):
     def test_stale_catalog_prints_warning_and_still_lists(self) -> None:
         with patch.object(cli, "load_catalog", return_value=LoadedCatalog(CATALOG, stale_reason="offline")):
