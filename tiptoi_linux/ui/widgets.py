@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import webbrowser
+
 from PySide6.QtCore import QSize, QRectF, Signal, Qt
 from PySide6.QtGui import QBrush, QColor, QFont, QLinearGradient, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import (
@@ -344,6 +346,11 @@ class FooterBar(QWidget):
         self.info.setObjectName("FooterInfo")
         self.info.setAlignment(Qt.AlignmentFlag.AlignRight)
 
+        self.update_link = QPushButton("")
+        self.update_link.setObjectName("FooterLink")
+        self.update_link.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.update_link.hide()
+
         layout = QHBoxLayout(self)
         layout.setContentsMargins(14, 0, 14, 0)
         layout.setSpacing(6)
@@ -353,4 +360,10 @@ class FooterBar(QWidget):
         layout.addStretch()
         layout.addWidget(self.progress)
         layout.addStretch()
+        layout.addWidget(self.update_link)
         layout.addWidget(self.info)
+
+    def show_update(self, url: str, version: str) -> None:
+        self.update_link.setText(_("New version {version}").format(version=version))
+        self.update_link.clicked.connect(lambda _checked=False: webbrowser.open(url))
+        self.update_link.show()

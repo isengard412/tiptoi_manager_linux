@@ -995,3 +995,24 @@ msgstr "Alle veralteten Titel aktualisieren"
 
 msgid "All titles are up to date"
 msgstr "Alle Titel sind aktuell"
+
+msgid "New version {version}"
+msgstr "Neue Version {version}"
+
+msgid "failed to check for a new version: {error}"
+msgstr "Fehler bei der Versionsprüfung: {error}"
+
+msgid "unexpected release feed response"
+msgstr "Unerwartete Antwort des Versionsdienstes"
+
+# --- settings menu ---
+msgid "Language"
+msgstr "Sprache"
+msgid "System default"
+msgstr "Systemstandard"
+msgid "About"
+msgstr "Über"
+msgid "The language changes after restarting the application."
+msgstr "Die Sprache wird nach einem Neustart der Anwendung geändert."
+msgid "unofficial tiptoi Manager for Linux {version}\n\nCommunity project based on tiptoi-linux by tokajer (GPL-3.0).\nThis program is not affiliated with or endorsed by Ravensburger; \"tiptoi\" is a trademark of Ravensburger AG."
+msgstr "Inoffizieller tiptoi Manager für Linux {version}\n\nCommunity-Projekt auf Basis von tiptoi-linux von tokajer (GPL-3.0).\nDieses Programm steht in keiner Verbindung zu Ravensburger und wird nicht von Ravensburger unterstützt; \"tiptoi\" ist eine Marke der Ravensburger AG."

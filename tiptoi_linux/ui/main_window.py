@@ -287,6 +287,22 @@ class TiptoiWindow(QMainWindow):
         # --- options menu --------------------------------------------------
         self._header.options_menu.addAction(_("Refresh catalog"), self._start_refresh)
         self._header.options_menu.addAction(_("Detect pen"), lambda: self._detect())
+        language_menu = self._header.options_menu.addMenu(_("Language"))
+        from PySide6.QtGui import QActionGroup
+
+        language_group = QActionGroup(language_menu)
+        for code, label in (
+            ("system", _("System default")),
+            ("de", "Deutsch"),
+            ("en", "English"),
+        ):
+            action = language_menu.addAction(label)
+            action.setCheckable(True)
+            action.setData(code)
+            language_group.addAction(action)
+            action.triggered.connect(lambda _checked=False, c=code: self._change_language(c))
+        self._header.options_menu.addSeparator()
+        self._header.options_menu.addAction(_("About"), self._show_about)
 
         # --- state machine (ported from the legacy MainWindow) ---------------
         self._catalog_job = BackgroundJob(self)
@@ -295,6 +311,8 @@ class TiptoiWindow(QMainWindow):
 
         self._cover_job = BackgroundJob(self)
         self._cover_job.finished.connect(self._on_cover_job_finished)
+
+        self._update_job = BackgroundJob(self)
 
         self._pen_job = BackgroundJob(self)
         self._pen_job.finished.connect(self._on_pen_job_finished)
@@ -338,6 +356,26 @@ class TiptoiWindow(QMainWindow):
 
     def start_initial_load(self) -> None:
         self._start_load(force=False)
+        self.start_update_check()
+
+    def start_update_check(self) -> None:
+        """Quietly compare against the latest GitHub release; show a footer link if newer."""
+        from tiptoi_linux.update import UpdateCheckError, fetch_latest_release, is_newer
+
+        def task(progress):
+            try:
+                info = fetch_latest_release()
+            except UpdateCheckError:
+                return None
+            if info is not None and is_newer(info.version, __version__):
+                return info
+            return None
+
+        def succeeded(info) -> None:
+            if info is not None:
+                self._footer.show_update(info.url, info.version)
+
+        self._update_job.start(task, succeeded, lambda message: None)
 
     def _on_catalog_job_finished(self) -> None:
         if self._close_when_idle and not self._catalog_job.is_running and not self._cover_job.is_running:
@@ -717,6 +755,28 @@ class TiptoiWindow(QMainWindow):
             return ConnectionState.PLUGGED_IN_UNMOUNTED
         return ConnectionState.DISCONNECTED
 
+    def _change_language(self, code: str) -> None:
+        from tiptoi_linux.settings import save_setting
+
+        save_setting("language", code)
+        QMessageBox.information(
+            self,
+            _("unofficial tiptoi Manager"),
+            _("The language changes after restarting the application."),
+        )
+
+    def _show_about(self) -> None:
+        QMessageBox.about(
+            self,
+            _("About"),
+            _(
+                "unofficial tiptoi Manager for Linux {version}\n\n"
+                "Community project based on tiptoi-linux by tokajer (GPL-3.0).\n"
+                "This program is not affiliated with or endorsed by Ravensburger; "
+                "\"tiptoi\" is a trademark of Ravensburger AG."
+            ).format(version=__version__),
+        )
+
     # --- firmware ------------------------------------------------------------
 
     def _update_outdated_button(self) -> None:
@@ -914,6 +974,7 @@ class TiptoiWindow(QMainWindow):
         self._poll_timer.stop()
         self._catalog_job.stop(0)
         self._cover_job.stop(0)
+        self._update_job.stop(0)
         if self._catalog_job.is_running or self._cover_job.is_running:
             self._close_when_idle = True
             self.hide()
