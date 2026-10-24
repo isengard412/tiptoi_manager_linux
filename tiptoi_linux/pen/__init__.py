@@ -20,6 +20,16 @@ from tiptoi_linux.pen.library import (
     outdated_titles,
     pen_summary,
 )
+from tiptoi_linux.pen.firmware import (
+    FIRMWARE_FILE_NAME,
+    FirmwareError,
+    FirmwareInfo,
+    download_firmware,
+    install_firmware,
+    parse_firmware_info,
+    read_pen_log,
+    verify_checksum,
+)
 
 __all__ = [
     "PEN_LABEL",
@@ -34,15 +44,23 @@ __all__ = [
     "device_mounted",
     "device_plugged_in",
     "disk_space",
+    "download_firmware",
     "empty_trash",
     "find_pen",
+    "FIRMWARE_FILE_NAME",
+    "FirmwareError",
+    "FirmwareInfo",
+    "install_firmware",
     "install_file",
     "install_title",
     "installed_gme_files",
     "mount_pen",
     "outdated_titles",
+    "parse_firmware_info",
     "pen_mount_alive",
     "pen_summary",
     "read_gme_version",
+    "read_pen_log",
     "unmount_pen",
+    "verify_checksum",
 ]

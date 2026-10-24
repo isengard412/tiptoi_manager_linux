@@ -281,6 +281,48 @@ class SearchBar(QWidget):
         layout.addWidget(self.button)
 
 
+class FirmwarePanel(QFrame):
+    """Pen-screen section: current vs available firmware and the update action."""
+
+    update_requested = Signal()
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self.setObjectName("PenCard")
+
+        title = QLabel(_("Firmware"))
+        title.setObjectName("PenCardTitle")
+        self.current_label = QLabel(_("No pen connected"))
+        self.current_label.setObjectName("FooterInfo")
+        self.update_button = pill_button(_("Update firmware"), primary=True)
+        self.update_button.setEnabled(False)
+        self.update_button.clicked.connect(lambda: self.update_requested.emit())
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(12, 10, 12, 10)
+        layout.setSpacing(6)
+        layout.addWidget(title)
+        layout.addWidget(self.current_label)
+        layout.addWidget(self.update_button, alignment=Qt.AlignmentFlag.AlignLeft)
+
+    def show_state(self, *, pen_version: str | None, latest_version: str | None, pending: bool, busy: bool) -> None:
+        if pen_version is None:
+            self.current_label.setText(_("Firmware-Version {version}").format(version="—"))
+        else:
+            self.current_label.setText(_("Firmware-Version {version}").format(version=pen_version))
+        if pending:
+            self.current_label.setText(_("A firmware update is pending on the pen"))
+            self.update_button.setEnabled(False)
+        elif latest_version and pen_version and latest_version != pen_version:
+            self.update_button.setText(_("Update firmware to {version}").format(version=latest_version))
+            self.update_button.setEnabled(not busy)
+        elif latest_version:
+            self.update_button.setText(_("Up to date"))
+            self.update_button.setEnabled(False)
+        else:
+            self.update_button.setEnabled(False)
+
+
 class FooterBar(QWidget):
     """Footer: legal links left, version/firmware/serial right, progress in the middle."""
 

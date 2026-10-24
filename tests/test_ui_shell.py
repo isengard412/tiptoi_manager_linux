@@ -115,5 +115,79 @@ class ShellTests(unittest.TestCase):
         self.assertTrue(card.free_pill.isHidden())
 
 
+@unittest.skipUnless(_PYSIDE6_AVAILABLE, "PySide6 is not installed")
+class FirmwareShellTests(unittest.TestCase):
+    """The firmware panel/footer react to the pen's .tiptoi.log and the catalog header."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        from PySide6.QtWidgets import QApplication
+
+        cls.app = QApplication.instance() or QApplication([])
+
+    def setUp(self) -> None:
+        import tempfile
+        from pathlib import Path
+
+        from tiptoi_linux.gui import Services
+        from tiptoi_linux.pen import FirmwareInfo
+        from tiptoi_linux.ui.main_window import TiptoiWindow
+
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.pen_dir = Path(self.tmp.name)
+        (self.pen_dir / ".tiptoi.log").write_text(
+            "serialNumber=987654321\nfirmwareversion=6GE020\n", encoding="utf-8"
+        )
+        pen = Pen(mountpoint=self.pen_dir, source=None)
+        services = Services(
+            load_catalog=lambda **kw: LoadedCatalog(parse_catalog(FIXTURE_CSV)),
+            find_pen=lambda **kw: pen,
+            pen_summary=lambda p, catalog: PenSummary(
+                pen=p, free=0, total=0, installed=(), outdated=[]
+            ),
+            device_plugged_in=lambda: False,
+            device_mounted=lambda: False,
+            pen_mount_alive=lambda p: True,
+        )
+        self.window = TiptoiWindow(services=services)
+        self.window._poll_timer.stop()
+        self.window._firmware_info = FirmwareInfo(
+            version="6GE027", checksum=1, url="https://example.invalid/x.upd"
+        )
+
+    def _connect(self) -> None:
+        from tests.test_gui import _pump_until_idle
+
+        self.window._detect()
+        _pump_until_idle(self.app, self.window._pen_job)
+
+    def test_update_button_offered_when_versions_differ(self) -> None:
+        self._connect()
+        button = self.window.firmware_panel.update_button
+        self.assertTrue(button.isEnabled())
+        self.assertIn("6GE027", button.text())
+
+    def test_footer_shows_serial_and_firmware(self) -> None:
+        self._connect()
+        info = self.window._footer.info.text()
+        self.assertIn("987654321", info)
+        self.assertIn("6GE020", info)
+
+    def test_pending_update_file_disables_button(self) -> None:
+        (self.pen_dir / "update.upd").write_bytes(b"x")
+        self._connect()
+        self.assertFalse(self.window.firmware_panel.update_button.isEnabled())
+
+    def test_same_version_disables_button(self) -> None:
+        from tiptoi_linux.pen import FirmwareInfo
+
+        self.window._firmware_info = FirmwareInfo(
+            version="6GE020", checksum=1, url="https://example.invalid/x.upd"
+        )
+        self._connect()
+        self.assertFalse(self.window.firmware_panel.update_button.isEnabled())
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -41,7 +41,7 @@ from tiptoi_linux.gui import (
     PollAction,
 )
 from tiptoi_linux.i18n import _, ngettext
-from tiptoi_linux.pen import Pen, PenSummary, Phase
+from tiptoi_linux.pen import FIRMWARE_FILE_NAME, Pen, PenSummary, Phase, read_pen_log
 from tiptoi_linux.streams import percent
 from tiptoi_linux.ui import theme, tiles, widgets
 
@@ -166,6 +166,8 @@ class TiptoiWindow(QMainWindow):
         *,
         portal_loader=None,
         cover_fetcher=None,
+        firmware_downloader=None,
+        firmware_installer=None,
     ) -> None:
         super().__init__()
         self._services = services if services is not None else Services()
@@ -177,8 +179,22 @@ class TiptoiWindow(QMainWindow):
             from tiptoi_linux.enrich import download_cover
 
             cover_fetcher = download_cover
+        if firmware_downloader is None:
+            from tiptoi_linux.pen import download_firmware
+
+            def firmware_downloader(info, *, progress):
+                return download_firmware(info, progress=progress)
+
+        if firmware_installer is None:
+            from tiptoi_linux.pen import install_firmware as _install_firmware
+
+            def firmware_installer(pen, path, *, info):
+                _install_firmware(pen, path, info=info)
+
         self._portal_loader = portal_loader
         self._cover_fetcher = cover_fetcher
+        self._firmware_downloader = firmware_downloader
+        self._firmware_installer = firmware_installer
         self.setWindowTitle(_("unofficial tiptoi Manager"))
         self.resize(1100, 700)
 
@@ -215,9 +231,12 @@ class TiptoiWindow(QMainWindow):
         self.pen_panel.choose_button.clicked.connect(self._choose_pen_folder)
         self.pen_panel.delete_button.clicked.connect(self._start_delete_selected)
         self.pen_panel.installed_list.itemSelectionChanged.connect(self._update_delete_button_enabled)
+        self.firmware_panel = widgets.FirmwarePanel()
+        self.firmware_panel.update_requested.connect(self._start_firmware_update)
         pen_screen_host = QWidget()
         pen_layout = QVBoxLayout(pen_screen_host)
         pen_layout.setContentsMargins(18, 16, 18, 12)
+        pen_layout.addWidget(self.firmware_panel)
         pen_layout.addWidget(self.pen_panel)
 
         self._stack = QStackedWidget()
@@ -273,6 +292,8 @@ class TiptoiWindow(QMainWindow):
 
         self._catalog: LoadedCatalog | None = None
         self._connection: ConnectionState | Connected = ConnectionState.DISCONNECTED
+        self._firmware_info = None  # FirmwareInfo | None
+        self._pen_fields: dict[str, str] = {}
 
         self._poll_timer = QTimer(self)
         self._poll_timer.setInterval(POLL_INTERVAL_MS)
@@ -334,6 +355,7 @@ class TiptoiWindow(QMainWindow):
             text = ngettext("{n} product", "{n} products", n).format(n=n)
         self.download_screen.result_count.setText(text)
         self._show_status(_("Catalog cached at {path}").format(path=cache_path()))
+        self._load_firmware_info()
         self._start_cover_refresh()
         if self._pen_job.is_running:
             self._summary_refresh_pending = True
@@ -578,6 +600,7 @@ class TiptoiWindow(QMainWindow):
     def _on_pen_job_finished(self) -> None:
         self._progress_bar.setVisible(False)
         self._update_action_buttons_enabled()
+        self._update_firmware_panel()
         if self._summary_refresh_pending:
             self._summary_refresh_pending = False
             if isinstance(self._connection, Connected):
@@ -606,8 +629,11 @@ class TiptoiWindow(QMainWindow):
         self._connection = Connected(summary.pen)
         self.pen_panel.show_summary(summary)
         self._model.set_installed(summary.installed)
+        self._pen_fields = read_pen_log(summary.pen)
         self._update_action_buttons_enabled()
         self._update_pen_card()
+        self._update_firmware_panel()
+        self._update_footer_info()
         if announce:
             self._show_status(message if message is not None else _("Pen ready"))
 
@@ -639,13 +665,112 @@ class TiptoiWindow(QMainWindow):
         self._connection = state
         self.pen_panel.reset()
         self._model.set_installed(())
+        self._pen_fields = {}
         self._update_action_buttons_enabled()
         self._update_pen_card()
+        self._update_firmware_panel()
+        self._update_footer_info()
 
     def _state_without_pen(self) -> ConnectionState:
         if self._services.device_plugged_in():
             return ConnectionState.PLUGGED_IN_UNMOUNTED
         return ConnectionState.DISCONNECTED
+
+    # --- firmware ------------------------------------------------------------
+
+    _FIRMWARE_LOG_KEYS = ("firmwareversion", "firmware", "fw", "version")
+    _SERIAL_LOG_KEYS = ("serialnumber", "serial", "sn")
+
+    def _load_firmware_info(self) -> None:
+        from tiptoi_linux.pen import parse_firmware_info
+
+        try:
+            text = cache_path().read_text(encoding="latin-1")
+        except OSError:
+            self._firmware_info = None
+            return
+        self._firmware_info = parse_firmware_info(text)
+
+    def _log_field(self, keys: tuple[str, ...]) -> str | None:
+        for key, value in self._pen_fields.items():
+            if key.casefold() in keys and value:
+                return value
+        return None
+
+    def _update_firmware_panel(self) -> None:
+        connected = isinstance(self._connection, Connected)
+        pending = False
+        if connected:
+            try:
+                pending = (self._connection.pen.mountpoint / FIRMWARE_FILE_NAME).exists()
+            except OSError:
+                pending = False
+        self.firmware_panel.show_state(
+            pen_version=self._log_field(self._FIRMWARE_LOG_KEYS) if connected else None,
+            latest_version=self._firmware_info.version if self._firmware_info else None,
+            pending=pending,
+            busy=self._pen_job.is_running,
+        )
+
+    def _update_footer_info(self) -> None:
+        parts = [_("unofficial tiptoi Manager for Linux {version}").format(version=__version__)]
+        if isinstance(self._connection, Connected):
+            serial = self._log_field(self._SERIAL_LOG_KEYS)
+            firmware = self._log_field(self._FIRMWARE_LOG_KEYS)
+            if serial:
+                parts.append(_("tiptoi® pen {serial}").format(serial=serial))
+            if firmware:
+                parts.append(_("Firmware-Version {version}").format(version=firmware))
+        self._footer.info.setText(" · ".join(parts))
+
+    def _start_firmware_update(self) -> None:
+        pen = self._pen()
+        info = self._firmware_info
+        if pen is None or info is None or self._pen_job.is_running:
+            return
+        box = QMessageBox(
+            QMessageBox.Icon.Question,
+            _("A new firmware version is available"),
+            _(
+                "A new firmware version is available for your tiptoi pen.\n\n"
+                "Do you want to update it now?"
+            ),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            self,
+        )
+        box.button(QMessageBox.StandardButton.Yes).setText(_("Update"))
+        box.button(QMessageBox.StandardButton.No).setText(_("Not now"))
+        if box.exec() != QMessageBox.StandardButton.Yes:
+            return
+
+        downloader = self._firmware_downloader
+        installer = self._firmware_installer
+
+        def task(progress):
+            path = downloader(info, progress=progress)
+            installer(pen, path, info=info)
+            return path
+
+        self._run_task(
+            task,
+            self._on_firmware_installed,
+            _("Downloading firmware update…"),
+        )
+
+    def _on_firmware_installed(self, result: object) -> None:
+        QMessageBox.information(
+            self,
+            _("Finish the firmware update"),
+            _(
+                "Please disconnect the pen from the computer and switch it on to complete "
+                "the update. Only do this with sufficiently charged batteries, otherwise "
+                "the update cannot run.\n\nWatch for the spoken instructions after "
+                "switching the pen on; never remove the batteries while the update runs. "
+                "Once the update is complete the pen announces it by voice."
+            ),
+        )
+        if isinstance(self._connection, Connected):
+            self._refresh_pen_summary(self._connection.pen, quiet=True)
 
     def _poll_pen(self) -> None:
         action = next_poll_action(
