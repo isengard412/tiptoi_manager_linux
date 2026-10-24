@@ -23,8 +23,19 @@ that work, adding a UI that mirrors the official tiptoi Manager:
 
 ## Status
 
-Work in progress. See `docs/reference/` for the style guide derived from the
-original application and `docs/PLAN.md` for the roadmap.
+Working today (see `docs/PLAN.md` for the roadmap):
+
+- ✅ tiptoi-Manager look-alike shell: orange header with pen card, left nav
+  rail, product tile grid, footer with version/serial/firmware
+- ✅ catalog browse + search, category filter chips (Bücher, Spiele, Puzzle, …)
+- ✅ real product covers fetched at runtime from Ravensburger's public CDN
+- ✅ install / verify / delete / outdated with one-click "update all"
+- ✅ firmware update flow (download, byte-sum checksum, staged as `update.upd`)
+- ✅ CLI (`tiptoi …`, incl. `tiptoi pen firmware [--install]`)
+- ✅ German UI aligned with the original wording; language choice in Optionen
+- ✅ self-update check against GitHub releases
+- ⏳ audio sample previews, product detail overlay, account/WLAN-pen features
+  (explicitly out of scope: login and purchases)
 
 ## Installation (from source)
 

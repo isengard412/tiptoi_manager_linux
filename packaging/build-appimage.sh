@@ -338,7 +338,7 @@ cert_path = os.environ.get("SSL_CERT_FILE", "")
 assert cert_path and os.path.exists(cert_path), f"SSL_CERT_FILE missing: {cert_path!r}"
 
 from PySide6.QtWidgets import QApplication
-from tiptoi_linux.gui import MainWindow
+from tiptoi_linux.ui.main_window import TiptoiWindow as MainWindow
 
 app = QApplication([])
 MainWindow()

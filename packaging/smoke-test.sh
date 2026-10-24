@@ -50,7 +50,7 @@ CERTS="./squashfs-root/opt/_internal/certs.pem"
 QT_QPA_PLATFORM=offscreen SSL_CERT_FILE="$CERTS" "$PYBIN" -c "
 from PySide6 import __version__ as qt_version
 from PySide6.QtWidgets import QApplication
-from tiptoi_linux.gui import MainWindow
+from tiptoi_linux.ui.main_window import TiptoiWindow as MainWindow
 
 app = QApplication([])
 MainWindow()

@@ -87,4 +87,4 @@ export QT_QPA_PLATFORM="${QT_QPA_PLATFORM:-xcb}"
 # certifi/PySide6 with host-glibc builds.
 unset PYTHONPATH PYTHONHOME PYTHONSTARTUP
 
-exec "$APPDIR/opt/python3.12/bin/python3.12" -m tiptoi_linux.gui "$@"
+exec "$APPDIR/opt/python3.12/bin/python3.12" -m tiptoi_linux.ui.app "$@"
