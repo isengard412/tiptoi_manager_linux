@@ -41,6 +41,11 @@ Working today (see `docs/PLAN.md` for the roadmap):
 
 ## Installation (from source)
 
+> Note: this repository (and its releases) are currently **private**, so the
+> AppImage is only downloadable by the account owner and the in-app version
+> check silently stays off (the anonymous GitHub API returns 404 for private
+> repositories). Making the repository public enables both with no code change.
+
 Requires Python 3.11 or newer.
 
 ```
