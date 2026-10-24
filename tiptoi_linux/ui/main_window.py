@@ -44,7 +44,7 @@ from tiptoi_linux.i18n import _, ngettext
 from tiptoi_linux.pen import FIRMWARE_FILE_NAME, Pen, PenSummary, Phase, read_pen_log
 from tiptoi_linux.streams import percent
 from tiptoi_linux.ui import catalog as catalog_screen_module
-from tiptoi_linux.ui import theme, tiles, widgets
+from tiptoi_linux.ui import detail, theme, tiles, widgets
 
 T = TypeVar("T")
 
@@ -73,6 +73,10 @@ class DownloadScreen(QWidget):
         self.result_count = QLabel("")
         self.result_count.setObjectName("ResultCount")
 
+        self.news_label = QLabel(_("New titles"))
+        self.news_label.setObjectName("ResultCount")
+        self.newest = tiles.NewestStrip()
+
         self.grid = QListView()
         self.grid.setObjectName("productGrid")
         self.grid.setViewMode(QListView.ViewMode.IconMode)
@@ -98,6 +102,8 @@ class DownloadScreen(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(18, 16, 18, 12)
         layout.addLayout(row)
+        layout.addWidget(self.news_label)
+        layout.addWidget(self.newest)
         layout.addWidget(self.result_count)
         layout.addWidget(self.grid, stretch=1)
 
@@ -169,6 +175,7 @@ class TiptoiWindow(QMainWindow):
         cover_fetcher=None,
         firmware_downloader=None,
         firmware_installer=None,
+        release_loader=None,
     ) -> None:
         super().__init__()
         self._services = services if services is not None else Services()
@@ -196,6 +203,11 @@ class TiptoiWindow(QMainWindow):
         self._cover_fetcher = cover_fetcher
         self._firmware_downloader = firmware_downloader
         self._firmware_installer = firmware_installer
+        if release_loader is None:
+            from tiptoi_linux.update import fetch_latest_release
+
+            release_loader = fetch_latest_release
+        self._release_loader = release_loader
         self.setWindowTitle(_("unofficial tiptoi Manager"))
         self.resize(1100, 700)
 
@@ -225,17 +237,24 @@ class TiptoiWindow(QMainWindow):
         self.download_screen.grid.selectionModel().selectionChanged.connect(
             self._update_install_button_enabled
         )
-        self.download_screen.grid.doubleClicked.connect(self._on_grid_double_clicked)
+        self.download_overlay = detail.DetailOverlay(self.download_screen)
+        self.download_overlay.install_requested.connect(self._install_product)
+        self.download_screen.newest.clicked.connect(
+            lambda product: self._show_detail_for(self.download_overlay, product)
+        )
+        self.download_screen.grid.clicked.connect(
+            lambda index: self._open_overlay(self.download_screen, index)
+        )
 
         self.catalog_screen = catalog_screen_module.CatalogScreen()
         self._catalog_proxy = catalog_screen_module.CatalogProxy(self)
         self.catalog_screen.use_model(self._model, self._catalog_proxy)
         self.catalog_screen.install_button.clicked.connect(self._start_install_catalog_selected)
         self.catalog_screen.on_selection_changed = self._update_install_button_enabled
-        self.catalog_screen.grid.doubleClicked.connect(
-            lambda _index: self._start_install_catalog_selected()
-            if self.catalog_screen.install_button.isEnabled()
-            else None
+        self.catalog_overlay = detail.DetailOverlay(self.catalog_screen)
+        self.catalog_overlay.install_requested.connect(self._install_product)
+        self.catalog_screen.grid.clicked.connect(
+            lambda index: self._open_overlay(self.catalog_screen, index)
         )
 
         self.pen_panel = PenPanel()
@@ -360,11 +379,13 @@ class TiptoiWindow(QMainWindow):
 
     def start_update_check(self) -> None:
         """Quietly compare against the latest GitHub release; show a footer link if newer."""
-        from tiptoi_linux.update import UpdateCheckError, fetch_latest_release, is_newer
+        from tiptoi_linux.update import UpdateCheckError, is_newer
+
+        loader = self._release_loader
 
         def task(progress):
             try:
-                info = fetch_latest_release()
+                info = loader()
             except UpdateCheckError:
                 return None
             if info is not None and is_newer(info.version, __version__):
@@ -378,7 +399,7 @@ class TiptoiWindow(QMainWindow):
         self._update_job.start(task, succeeded, lambda message: None)
 
     def _on_catalog_job_finished(self) -> None:
-        if self._close_when_idle and not self._catalog_job.is_running and not self._cover_job.is_running:
+        if self._close_when_idle and not self._catalog_job.is_running and not self._cover_job.is_running and not self._update_job.is_running:
             self._close_when_idle = False
             self.close()
             from PySide6.QtWidgets import QApplication
@@ -386,7 +407,7 @@ class TiptoiWindow(QMainWindow):
             QApplication.quit()
 
     def _on_cover_job_finished(self) -> None:
-        if self._close_when_idle and not self._catalog_job.is_running and not self._cover_job.is_running:
+        if self._close_when_idle and not self._catalog_job.is_running and not self._cover_job.is_running and not self._update_job.is_running:
             self._close_when_idle = False
             self.close()
             from PySide6.QtWidgets import QApplication
@@ -407,12 +428,19 @@ class TiptoiWindow(QMainWindow):
             text = ngettext("{n} product", "{n} products", n).format(n=n)
         self.download_screen.result_count.setText(text)
         self._show_status(_("Catalog cached at {path}").format(path=cache_path()))
+        self._refresh_news()
         self._load_firmware_info()
         self._start_cover_refresh()
         if self._pen_job.is_running:
             self._summary_refresh_pending = True
         elif isinstance(self._connection, Connected):
             self._refresh_pen_summary(self._connection.pen)
+
+    def _refresh_news(self) -> None:
+        if self._catalog is not None:
+            self.download_screen.newest.set_products(
+                list(self._catalog.catalog.products), self._model.cover_for
+            )
 
     def _show_error(self, message: str) -> None:
         self._show_status(_("error: {message}").format(message=message))
@@ -463,6 +491,7 @@ class TiptoiWindow(QMainWindow):
                 categories = sorted(set(index.categories.values()))
                 self.catalog_screen.set_categories(categories)
                 self._catalog_proxy.set_mapping(mapping, index.categories)
+                self._refresh_news()
 
         def failed(message: str) -> None:
             self._progress_bar.setVisible(False)
@@ -491,11 +520,26 @@ class TiptoiWindow(QMainWindow):
         source_index = self._proxy.mapToSource(indexes[0])
         return self._model.product_at(source_index.row())
 
-    def _on_grid_double_clicked(self, index: QModelIndex) -> None:
+    def _open_overlay(self, screen, index) -> None:
+        """Show the detail card for a clicked tile on either grid screen."""
         if not index.isValid():
             return
-        if self.download_screen.install_button.isEnabled():
-            self._start_install_selected()
+        proxy = index.model()
+        product = self._model.product_at(proxy.mapToSource(index).row())
+        if product is None:
+            return
+        overlay = self.download_overlay if screen is self.download_screen else self.catalog_overlay
+        self._show_detail_for(overlay, product)
+
+    def _show_detail_for(self, overlay, product: Product) -> None:
+        overlay.show_product(
+            product,
+            item=self._model.item_for(product.name),
+            category=self._catalog_proxy.category_of(product.name),
+            pixmap=self._model.cover_for(product),
+            installed=self._model.is_installed(product),
+            can_install=self._pen_idle(),
+        )
 
     def _pen(self) -> Pen | None:
         return self._connection.pen if isinstance(self._connection, Connected) else None
@@ -975,7 +1019,11 @@ class TiptoiWindow(QMainWindow):
         self._catalog_job.stop(0)
         self._cover_job.stop(0)
         self._update_job.stop(0)
-        if self._catalog_job.is_running or self._cover_job.is_running:
+        if (
+            self._catalog_job.is_running
+            or self._cover_job.is_running
+            or self._update_job.is_running
+        ):
             self._close_when_idle = True
             self.hide()
             event.ignore()

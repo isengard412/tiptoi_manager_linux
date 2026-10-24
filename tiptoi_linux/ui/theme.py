@@ -223,5 +223,22 @@ def build_style_sheet() -> str:
 
     QLabel#Placeholder {{ color: {TEXT_GRAY}; font-size: 14px; }}
 
+    /* --- detail overlay ---------------------------------------------------- */
+    QWidget#DetailCard {{
+        background: {BG_WHITE};
+        border-radius: 14px;
+        border: 1px solid {BORDER_LIGHT};
+    }}
+    QWidget#DetailCard QLabel {{ background: transparent; }}
+    QLabel#DetailTitle {{ font-size: 20px; font-weight: 800; color: {FRAME_TEAL}; }}
+    QLabel#DetailCategory {{
+        color: {BRAND_ORANGE_DEEP}; font-size: 12px; font-weight: 700;
+    }}
+    QPushButton#DetailClose {{
+        background: {BG_LIGHT}; color: {TEXT_GRAY}; border: none;
+        border-radius: 15px; font-size: 16px; font-weight: 700;
+    }}
+    QPushButton#DetailClose:hover {{ background: {NAV_ACTIVE}; color: {BG_WHITE}; }}
+
     QMessageBox {{ background: {BG_WHITE}; }}
     """

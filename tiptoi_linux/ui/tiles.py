@@ -9,9 +9,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PySide6.QtCore import QModelIndex, QPersistentModelIndex, QRectF, QSize, Qt
-from PySide6.QtGui import QColor, QFont, QFontMetrics, QPainter, QPainterPath, QPen, QPixmap
-from PySide6.QtWidgets import QStyledItemDelegate
+from PySide6.QtCore import QModelIndex, QPersistentModelIndex, QRectF, QSize, Qt, Signal
+from PySide6.QtGui import QColor, QFont, QFontMetrics, QIcon, QPainter, QPainterPath, QPen, QPixmap
+from PySide6.QtWidgets import QHBoxLayout, QScrollArea, QStyledItemDelegate, QToolButton, QVBoxLayout, QWidget
 
 from tiptoi_linux.catalog import Product, gme_file_name
 from tiptoi_linux.gui import Column, ProductTableModel
@@ -48,6 +48,12 @@ class CoverTableModel(ProductTableModel):
         bottom_right = self.index(self.rowCount() - 1, Column.NAME)
         if self.rowCount():
             self.dataChanged.emit(top_left, bottom_right, [Qt.ItemDataRole.DecorationRole])
+
+    def item_for(self, product_name: str) -> str | None:
+        return self._items.get(product_name)
+
+    def is_installed(self, product: Product) -> bool:
+        return self._is_installed(product)
 
     def cover_for(self, product: Product) -> QPixmap | None:
         item = self._items.get(product.name)
@@ -171,3 +177,61 @@ class TileDelegate(QStyledItemDelegate):
         model = index.model()
         source = getattr(model, "sourceModel", lambda: None)()
         return source if isinstance(source, CoverTableModel) else None
+
+
+class NewestStrip(QWidget):
+    """Horizontal row of the newest catalog products (by version date), like the
+    original download screen's news section."""
+
+    clicked = Signal(object)  # Product
+
+    COUNT = 8
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self._holder = QWidget()
+        self._row = QHBoxLayout(self._holder)
+        self._row.setContentsMargins(0, 0, 0, 0)
+        self._row.setSpacing(10)
+
+        scroller = QScrollArea()
+        scroller.setWidget(self._holder)
+        scroller.setWidgetResizable(True)
+        scroller.setFrameShape(QScrollArea.Shape.NoFrame)
+        scroller.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroller.setFixedHeight(170)
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(0, 0, 0, 0)
+        outer.addWidget(scroller)
+
+    def set_products(self, products: list[Product], cover_provider) -> None:
+        while self._row.count():
+            item = self._row.takeAt(0)
+            if item.widget():
+                # WHY: setParent(None) destroys deterministically; deleteLater would queue
+                # events that Qt may process against a half-torn-down Python at exit
+                item.widget().setParent(None)
+
+        newest = sorted(products, key=lambda p: p.version, reverse=True)[: self.COUNT]
+        for product in newest:
+            button = QToolButton()
+            button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
+            button.setFixedSize(120, 160)
+            pixmap = cover_provider(product)
+            if pixmap is not None and not pixmap.isNull():
+                button.setIcon(
+                    QIcon(
+                        pixmap.scaled(
+                            QSize(110, 120),
+                            Qt.AspectRatioMode.KeepAspectRatio,
+                            Qt.TransformationMode.SmoothTransformation,
+                        )
+                    )
+                )
+                button.setIconSize(QSize(110, 120))
+            name = product.name.replace("_", " ")
+            button.setText(name if len(name) <= 18 else name[:17] + "…")
+            button.setCursor(Qt.CursorShape.PointingHandCursor)
+            button.clicked.connect(lambda _checked=False, p=product: self.clicked.emit(p))
+            self._row.addWidget(button)
+        self._row.addStretch()

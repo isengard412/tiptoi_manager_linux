@@ -10,13 +10,14 @@ from pathlib import Path
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 try:
-    from PySide6.QtCore import QEvent
+    from PySide6.QtCore import QEvent, Qt
 
     _PYSIDE6_AVAILABLE = True
 except ImportError:
     _PYSIDE6_AVAILABLE = False
 
 from tiptoi_linux.catalog import LoadedCatalog, parse_catalog
+from tiptoi_linux.enrich import PortalIndex
 from tiptoi_linux.pen import Pen, PenSummary
 
 from tests.test_gui import FIXTURE_CSV
@@ -63,7 +64,12 @@ class ShellTests(unittest.TestCase):
             device_mounted=lambda: False,
             pen_mount_alive=lambda pen: True,
         )
-        self.window = TiptoiWindow(services=self.services)
+        self.window = TiptoiWindow(
+            services=self.services,
+            portal_loader=lambda: PortalIndex({}),
+            cover_fetcher=lambda item: None,
+            release_loader=lambda: None,
+        )
         self.window._poll_timer.stop()  # keep tests deterministic
 
     def tearDown(self) -> None:
@@ -114,6 +120,29 @@ class ShellTests(unittest.TestCase):
         self.assertTrue(card.status_pill.text())  # localized; must not be empty
         self.assertTrue(card.free_pill.isHidden())
 
+    def test_tile_click_opens_detail_overlay(self) -> None:
+        self.window.start_initial_load()
+        _pump_until_idle(self.app, self.window._catalog_job)
+        self.window.download_screen.grid.setCurrentIndex(self.window._proxy.index(1, 0))
+        self.window.download_screen.grid.clicked.emit(self.window._proxy.index(1, 0))
+        overlay = self.window.download_overlay
+        self.assertFalse(overlay.isHidden())
+        self.assertIn("WissenQuizzen", overlay.title.text())
+        self.assertFalse(overlay.install_button.isEnabled())  # no pen connected
+
+    def test_overlay_esc_closes(self) -> None:
+        from PySide6.QtGui import QKeyEvent
+        from PySide6.QtCore import QEvent
+
+        self.window.start_initial_load()
+        _pump_until_idle(self.app, self.window._catalog_job)
+        index = self.window._proxy.index(0, 0)
+        self.window.download_screen.grid.clicked.emit(index)
+        self.assertFalse(self.window.download_overlay.isHidden())
+        event = QKeyEvent(QEvent.Type.KeyPress, Qt.Key.Key_Escape, Qt.KeyboardModifier.NoModifier)
+        self.window.download_overlay.keyPressEvent(event)
+        self.assertTrue(self.window.download_overlay.isHidden())
+
 
 @unittest.skipUnless(_PYSIDE6_AVAILABLE, "PySide6 is not installed")
 class FirmwareShellTests(unittest.TestCase):
@@ -150,7 +179,12 @@ class FirmwareShellTests(unittest.TestCase):
             device_mounted=lambda: False,
             pen_mount_alive=lambda p: True,
         )
-        self.window = TiptoiWindow(services=services)
+        self.window = TiptoiWindow(
+            services=services,
+            portal_loader=lambda: PortalIndex({}),
+            cover_fetcher=lambda item: None,
+            release_loader=lambda: None,
+        )
         self.window._poll_timer.stop()
         self.window._firmware_info = FirmwareInfo(
             version="6GE027", checksum=1, url="https://example.invalid/x.upd"
@@ -223,7 +257,12 @@ class UpdateChainTests(unittest.TestCase):
             device_mounted=lambda: False,
             pen_mount_alive=lambda p: True,
         )
-        self.window = TiptoiWindow(services=services)
+        self.window = TiptoiWindow(
+            services=services,
+            portal_loader=lambda: PortalIndex({}),
+            cover_fetcher=lambda item: None,
+            release_loader=lambda: None,
+        )
         self.window._poll_timer.stop()
 
     def test_chain_installs_outdated_product(self) -> None:

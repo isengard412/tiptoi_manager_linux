@@ -1016,3 +1016,18 @@ msgid "The language changes after restarting the application."
 msgstr "Die Sprache wird nach einem Neustart der Anwendung geändert."
 msgid "unofficial tiptoi Manager for Linux {version}\n\nCommunity project based on tiptoi-linux by tokajer (GPL-3.0).\nThis program is not affiliated with or endorsed by Ravensburger; \"tiptoi\" is a trademark of Ravensburger AG."
 msgstr "Inoffizieller tiptoi Manager für Linux {version}\n\nCommunity-Projekt auf Basis von tiptoi-linux von tokajer (GPL-3.0).\nDieses Programm steht in keiner Verbindung zu Ravensburger und wird nicht von Ravensburger unterstützt; \"tiptoi\" ist eine Marke der Ravensburger AG."
+
+# --- detail overlay ---
+msgid "More information"
+msgstr "Weitere Informationen"
+msgid "Uncategorized"
+msgstr "Ohne Kategorie"
+msgid "Installed on the pen"
+msgstr "Auf dem Stift vorhanden"
+msgid "Installed"
+msgstr "Vorhanden"
+msgid "Version: {version}"
+msgstr "Version: {version}"
+
+msgid "New titles"
+msgstr "Aktuelles"
