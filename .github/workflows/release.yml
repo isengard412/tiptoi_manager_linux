@@ -118,7 +118,7 @@ jobs:
         env:
           QT_QPA_PLATFORM: offscreen
           LANGUAGE: C
-        run: python -m unittest discover -s tests -t .
+        run: python -m tests.run
 
   release:
     needs: [resolve, test]

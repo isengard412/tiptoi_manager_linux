@@ -57,7 +57,7 @@ Run the tests:
 
 ```
 pip install PySide6-Essentials
-QT_QPA_PLATFORM=offscreen python -m unittest discover -s tests -t .
+QT_QPA_PLATFORM=offscreen python -m tests.run
 ```
 
 ## License

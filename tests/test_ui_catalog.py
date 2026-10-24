@@ -42,6 +42,13 @@ class CatalogScreenTests(unittest.TestCase):
             categories={"00001": "CREATE", "00002": "Spiele"},
         )
 
+    def tearDown(self) -> None:
+        # WHY: delete the parentless screen while Qt is still alive; GC'ing it during
+        # interpreter shutdown corrupts the heap (crash seen with LANGUAGE=C)
+        self.screen.deleteLater()
+        self.app.processEvents()
+        self.screen = None
+
     def test_all_products_visible_initially(self) -> None:
         self.assertEqual(self.proxy.rowCount(), len(self.catalog.products))
 

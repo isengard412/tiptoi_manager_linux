@@ -33,6 +33,16 @@ def _pump_until_idle(app, job, timeout_s: float = 5.0) -> None:
     app.processEvents()
 
 
+def destroy_window(app, window) -> None:
+    # WHY: close + deleteLater while Qt is alive; letting the last window be GC'd at
+    # interpreter shutdown corrupts the heap (intermittent "corrupted double-linked list")
+    window.close()
+    window.deleteLater()
+    app.processEvents()
+    app.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+    app.processEvents()
+
+
 @unittest.skipUnless(_PYSIDE6_AVAILABLE, "PySide6 is not installed")
 class ShellTests(unittest.TestCase):
     @classmethod
@@ -73,7 +83,7 @@ class ShellTests(unittest.TestCase):
         self.window._poll_timer.stop()  # keep tests deterministic
 
     def tearDown(self) -> None:
-        self.window.close()
+        destroy_window(self.app, self.window)
 
     def test_nav_has_five_entries_in_original_order(self) -> None:
         self.assertEqual(len(self.window._nav._buttons), 5)
@@ -190,6 +200,9 @@ class FirmwareShellTests(unittest.TestCase):
             version="6GE027", checksum=1, url="https://example.invalid/x.upd"
         )
 
+    def tearDown(self) -> None:
+        destroy_window(self.app, self.window)
+
     def _connect(self) -> None:
         from tests.test_gui import _pump_until_idle
 
@@ -264,6 +277,9 @@ class UpdateChainTests(unittest.TestCase):
             release_loader=lambda: None,
         )
         self.window._poll_timer.stop()
+
+    def tearDown(self) -> None:
+        destroy_window(self.app, self.window)
 
     def test_chain_installs_outdated_product(self) -> None:
         from tests.test_gui import _pump_until_idle
