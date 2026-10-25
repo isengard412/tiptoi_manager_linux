@@ -44,13 +44,11 @@ def build_style_sheet() -> str:
         border-bottom: 1px solid {BRAND_ORANGE};
     }}
     HeaderBar QLabel {{ background: transparent; }}
-    QLabel#LogoText {{
+    QLabel#AppName {{
         color: {BG_WHITE};
-        font-size: 30px;
-        font-weight: 800;
-        letter-spacing: -1px;
+        font-size: 17px;
+        font-weight: 700;
     }}
-    QLabel#LogoR {{ color: {BG_WHITE}; font-size: 12px; font-weight: 600; }}
     QLabel#LogoSub {{ color: {FRAME_TEAL}; font-size: 11px; }}
 
     QPushButton#OptionsButton {{

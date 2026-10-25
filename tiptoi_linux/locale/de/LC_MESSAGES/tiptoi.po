@@ -1031,3 +1031,10 @@ msgstr "Version: {version}"
 
 msgid "New titles"
 msgstr "Aktuelles"
+
+msgid "tiptoi Manager"
+msgstr "tiptoi Manager"
+
+msgid "unofficial · for Linux"
+msgstr "inoffiziell · für Linux"
+

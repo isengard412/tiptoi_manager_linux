@@ -192,3 +192,15 @@ def pen_device_icon() -> QIcon:
     if key not in _ICON_CACHE:
         _ICON_CACHE[key] = circle_icon(theme.ICON_BLUE, _glyph_pen)
     return _ICON_CACHE[key]
+
+
+def app_icon() -> QIcon:
+    """The application's own icon (packaging/tiptoi.svg rendered to PNG)."""
+    key = "__app__"
+    if key not in _ICON_CACHE:
+        from pathlib import Path
+
+        path = Path(__file__).resolve().parent.parent / "resources" / "tiptoi.png"
+        icon = QIcon(str(path))
+        _ICON_CACHE[key] = icon if not icon.isNull() else pen_device_icon()
+    return _ICON_CACHE[key]

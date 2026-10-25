@@ -1,17 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
-  <rect width="256" height="256" rx="48" fill="#233047"/>
-  <path d="M32 88 L124 74 L124 192 L32 206 Z" fill="#f3ead9"/>
-  <path d="M224 88 L132 74 L132 192 L224 206 Z" fill="#e2d6bd"/>
-  <rect x="124" y="74" width="8" height="118" fill="#233047"/>
-  <line x1="48" y1="104" x2="108" y2="94" stroke="#c3b393" stroke-width="4" stroke-linecap="round"/>
-  <line x1="48" y1="122" x2="108" y2="112" stroke="#c3b393" stroke-width="4" stroke-linecap="round"/>
-  <line x1="48" y1="140" x2="108" y2="130" stroke="#c3b393" stroke-width="4" stroke-linecap="round"/>
-  <line x1="48" y1="158" x2="108" y2="148" stroke="#c3b393" stroke-width="4" stroke-linecap="round"/>
-  <g transform="rotate(35 150 150)">
-    <rect x="138" y="40" width="24" height="150" rx="12" fill="#e2953f"/>
-    <path d="M138 40 a12 12 0 0 1 24 0 z" fill="#b96f26"/>
-    <rect x="146" y="182" width="8" height="18" rx="3" fill="#2c2c2c"/>
+  <!-- Original identity mark for the unofficial tiptoi Manager for Linux.
+       An "audio pen": a stylised nib with sound arcs, in the app's own
+       orange/teal/cream palette. No trademarked artwork is reproduced. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffc14d"/>
+      <stop offset="1" stop-color="#f7a900"/>
+    </linearGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+
+  <!-- sound arcs, cream -->
+  <g fill="none" stroke="#f6efe3" stroke-linecap="round">
+    <path d="M70 126 a54 54 0 0 0 0 74" stroke-width="11"/>
+    <path d="M58 138 a26 26 0 0 0 0 36" stroke-width="11"/>
+    <circle cx="106" cy="176" r="7" fill="#f6efe3" stroke="none"/>
   </g>
-  <path d="M186 96 a24 24 0 0 1 0 40" fill="none" stroke="#8fd0c6" stroke-width="7" stroke-linecap="round"/>
-  <path d="M198 84 a40 40 0 0 1 0 64" fill="none" stroke="#8fd0c6" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- the pen nib, dark teal -->
+  <g>
+    <path d="M198 96 q6 60 -8 78 l-12 4 -32 -40 20 -56 z" fill="#497a88"/>
+    <!-- body -->
+    <path d="M118 88 l96 -54 12 12 -54 96 z" fill="#ffffff"/>
+    <!-- lighter top band -->
+    <path d="M190 46 l20 20 -6 10 -20 -20 z" fill="#cfe0e6" opacity="0.9"/>
+    <!-- tip accent -->
+    <circle cx="126" cy="168" r="10" fill="#233047"/>
+  </g>
+
+  <!-- three small audio dots -->
+  <g fill="#233047">
+    <circle cx="86" cy="92" r="6"/>
+    <circle cx="104" cy="108" r="5"/>
+    <circle cx="88" cy="126" r="4"/>
+  </g>
 </svg>

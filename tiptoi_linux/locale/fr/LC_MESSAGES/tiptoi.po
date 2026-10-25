@@ -657,3 +657,10 @@ msgstr "Version : {version}"
 
 msgid "New titles"
 msgstr "Nouveautés"
+
+msgid "tiptoi Manager"
+msgstr "tiptoi Manager"
+
+msgid "unofficial · for Linux"
+msgstr "non officiel · pour Linux"
+

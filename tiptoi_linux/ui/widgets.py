@@ -112,21 +112,25 @@ class HeaderBar(QWidget):
         self.setFixedHeight(86)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
-        logo = QLabel("tiptoi")
-        logo.setObjectName("LogoText")
-        reg = QLabel("®")
-        reg.setObjectName("LogoR")
-        sub = QLabel(_("unofficial manager for Linux"))
+        # Own identity mark: the app icon + its name, no trademark wordmark.
+        icon_label = QLabel()
+        icon_label.setPixmap(icons.app_icon().pixmap(48, 48))
+        icon_label.setAccessibleName("tiptoi")
+        name = QLabel(_("tiptoi Manager"))
+        name.setObjectName("AppName")
+        sub = QLabel(_("unofficial · for Linux"))
         sub.setObjectName("LogoSub")
 
-        logo_block = QVBoxLayout()
-        logo_block.setSpacing(0)
-        word_row = QHBoxLayout()
-        word_row.setSpacing(2)
-        word_row.addWidget(logo)
-        word_row.addWidget(reg, alignment=Qt.AlignmentFlag.AlignTop)
-        logo_block.addLayout(word_row)
-        logo_block.addWidget(sub)
+        text_col = QVBoxLayout()
+        text_col.setSpacing(0)
+        text_col.addWidget(name)
+        text_col.addWidget(sub)
+
+        logo_block = QHBoxLayout()
+        logo_block.setSpacing(10)
+        logo_block.addWidget(icon_label)
+        logo_block.addLayout(text_col)
+        logo_block.addStretch()
 
         self.pen_card = PenCard()
 

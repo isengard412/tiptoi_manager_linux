@@ -16,7 +16,7 @@ PO_PATH = LOCALE_DIR / "de" / "LC_MESSAGES" / "tiptoi.po"
 MO_PATH = LOCALE_DIR / "de" / "LC_MESSAGES" / "tiptoi.mo"
 
 # Strings that are legitimately identical in German.
-SAME_IN_GERMAN = frozenset({"OK", "tiptoi", "Version", "Firmware", "Firmware-Version {version}", "Version: {version}"})
+SAME_IN_GERMAN = frozenset({"OK", "tiptoi", "Version", "Firmware", "Firmware-Version {version}", "Version: {version}", "tiptoi Manager"})
 
 
 def _load_german() -> gettext.GNUTranslations:
