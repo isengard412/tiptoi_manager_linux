@@ -6,6 +6,7 @@ category, install action and a link to the service portal.
 
 from __future__ import annotations
 
+import urllib.parse
 import webbrowser
 
 from PySide6.QtCore import Qt, Signal
@@ -22,7 +23,7 @@ from tiptoi_linux.catalog import Product
 from tiptoi_linux.i18n import _
 from tiptoi_linux.ui import theme, widgets
 
-PORTAL_PRODUCT_URL = "https://service.ravensburger.de/Special:Search?tags={item}"
+SHOP_SEARCH_URL = "https://www.ravensburger.de/de-DE/suche?query={query}"
 
 
 class DetailOverlay(QWidget):
@@ -37,6 +38,7 @@ class DetailOverlay(QWidget):
         self.hide()
         self._product: Product | None = None
         self._item: str | None = None
+        self._page_url: str | None = None
 
         self._card = QWidget()
         self._card.setObjectName("DetailCard")
@@ -117,9 +119,11 @@ class DetailOverlay(QWidget):
         pixmap,
         installed: bool,
         can_install: bool,
+        page_url: str | None = None,
     ) -> None:
         self._product = product
         self._item = item
+        self._page_url = page_url
         self.title.setText(product.name.replace("_", " "))
         self.version_label.setText(_("Version: {version}").format(version=product.version))
         self.category_label.setText(category or _("Uncategorized"))
@@ -180,5 +184,9 @@ class DetailOverlay(QWidget):
             self.install_requested.emit(self._product)
 
     def _open_portal(self) -> None:
-        if self._item:
-            webbrowser.open(PORTAL_PRODUCT_URL.format(item=self._item))
+        if self._page_url:
+            webbrowser.open(self._page_url)
+        elif self._product is not None:
+            # no known portal page - fall back to a shop search by product name
+            query = urllib.parse.quote(self._product.name.replace("_", " "))
+            webbrowser.open(SHOP_SEARCH_URL.format(query=query))

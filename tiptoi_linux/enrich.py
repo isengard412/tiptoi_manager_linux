@@ -29,7 +29,7 @@ MAX_COVER_BYTES = 2 * 1024 * 1024
 
 _ITEM_SUFFIX_RE = re.compile(r"^(?P<name>.+?)_(?P<item>\d{5})$")
 _LINK_RE = re.compile(
-    r'<a[^>]*href="[^"]*tiptoi%C2%AE_Audiodateien/([^"#?]+)"[^>]*>(.*?)</a>',
+    r'<a[^>]*href="([^"]*tiptoi%C2%AE_Audiodateien/[^"#?]+)"[^>]*>(.*?)</a>',
     re.IGNORECASE | re.DOTALL,
 )
 _TAG_RE = re.compile(r"<[^>]+>")
@@ -92,6 +92,8 @@ class PortalIndex:
     compact: dict[str, str] = field(default_factory=dict)
     # article number -> portal tree section ("Bücher", "Puzzle", ...); drives the catalog filter bar
     categories: dict[str, str] = field(default_factory=dict)
+    # normalized name -> service-portal page URL (the product's own download page)
+    pages: dict[str, str] = field(default_factory=dict)
 
     @property
     def size(self) -> int:
@@ -186,8 +188,10 @@ def parse_portal_links(html: str) -> PortalIndex:
     """
     items: dict[str, str] = {}
     categories: dict[str, str] = {}
-    for raw_path, raw_text in _LINK_RE.findall(html):
-        segments = [s for s in raw_path.split("/") if s]
+    pages: dict[str, str] = {}
+    for href, raw_text in _LINK_RE.findall(html):
+        path = href.split("tiptoi%C2%AE_Audiodateien/", 1)[1]
+        segments = [s for s in path.split("/") if s]
         if not segments:
             continue
         raw_slug = segments[-1]
@@ -199,6 +203,7 @@ def parse_portal_links(html: str) -> PortalIndex:
         if not name:
             continue
         items.setdefault(name, match.group("item"))
+        pages.setdefault(name, href)
         if len(segments) >= 2:  # the parent segment is the portal's category section
             raw = urllib.parse.unquote(segments[-2]).replace("_", " ").strip()
             raw = re.sub(r"(?i)^(?:audiodateien?|audioatei)\s+", "", raw)
@@ -206,7 +211,7 @@ def parse_portal_links(html: str) -> PortalIndex:
             if raw:
                 categories.setdefault(match.group("item"), raw)
     compact = {name.replace(" ", ""): item for name, item in items.items()}
-    return PortalIndex(items, compact, categories)
+    return PortalIndex(items, compact, categories, pages)
 
 
 def cover_url(item: str) -> str:

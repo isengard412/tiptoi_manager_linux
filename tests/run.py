@@ -26,6 +26,10 @@ def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     verbosity = 2 if "-v" in argv else 1
 
+    # Pin the test language to English before any tiptoi module is imported (i18n binds
+    # gettext at import time); tests/__init__.py does the same for `unittest discover`.
+    os.environ["LANGUAGE"] = "C"
+
     loader = unittest.TestLoader()
     suite = loader.discover(str(REPO_ROOT / "tests"), top_level_dir=str(REPO_ROOT))
     result = unittest.TextTestRunner(verbosity=verbosity).run(suite)

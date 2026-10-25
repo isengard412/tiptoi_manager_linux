@@ -1038,3 +1038,15 @@ msgstr "tiptoi Manager"
 msgid "unofficial · for Linux"
 msgstr "inoffiziell · für Linux"
 
+
+msgid "Official tiptoi homepage"
+msgstr "Offizielle tiptoi-Website"
+
+msgid "tiptoi Manager (download)"
+msgstr "tiptoi Manager (Download)"
+
+msgid "Open source project (GitHub)"
+msgstr "Open-Source-Projekt (GitHub)"
+
+msgid "This program collects no personal data, contains no telemetry and never uploads anything about you or your pen.\n\nIt only connects to Ravensburger's public servers to download the product catalog, firmware information and cover images, which are cached locally on this computer. The pen is accessed exclusively over USB.\n\nThis software is free and open source (GPL-3.0). Source code, license and releases are published on GitHub:\n{github}"
+msgstr "Dieses Programm sammelt keine personenbezogenen Daten, enthält keine Telemetrie und lädt niemals etwas über Sie oder Ihren Stift hoch.\n\nEs verbindet sich ausschließlich mit den öffentlichen Ravensburger-Servern, um Produktkatalog, Firmware-Informationen und Titelbilder herunterzuladen; diese werden lokal auf diesem Computer zwischengespeichert. Auf den Stift wird ausschließlich per USB zugegriffen.\n\nDiese Software ist freie und quelloffene Software (GPL-3.0). Quellcode, Lizenz und Versionen sind auf GitHub veröffentlicht:\n{github}"

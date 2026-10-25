@@ -330,12 +330,15 @@ class FirmwarePanel(QFrame):
 
 
 class FooterBar(QWidget):
-    """Footer: legal links left, version/firmware/serial right, progress in the middle."""
+    """Footer: version bottom-left, legal links, progress and update link on the right."""
 
     def __init__(self, version_text: str, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.setObjectName("FooterBar")
         self.setFixedHeight(30)
+
+        self.info = QLabel(version_text)
+        self.info.setObjectName("FooterInfo")
 
         self.privacy_link = QPushButton(_("Privacy"))
         self.imprint_link = QPushButton(_("Legal notice"))
@@ -346,10 +349,6 @@ class FooterBar(QWidget):
         self.progress = QLabel("")
         self.progress.setObjectName("FooterInfo")
 
-        self.info = QLabel(version_text)
-        self.info.setObjectName("FooterInfo")
-        self.info.setAlignment(Qt.AlignmentFlag.AlignRight)
-
         self.update_link = QPushButton("")
         self.update_link.setObjectName("FooterLink")
         self.update_link.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -358,6 +357,8 @@ class FooterBar(QWidget):
         layout = QHBoxLayout(self)
         layout.setContentsMargins(14, 0, 14, 0)
         layout.setSpacing(6)
+        layout.addWidget(self.info)
+        layout.addWidget(QLabel("·"))
         layout.addWidget(self.privacy_link)
         layout.addWidget(QLabel("·"))
         layout.addWidget(self.imprint_link)
@@ -365,7 +366,6 @@ class FooterBar(QWidget):
         layout.addWidget(self.progress)
         layout.addStretch()
         layout.addWidget(self.update_link)
-        layout.addWidget(self.info)
 
     def show_update(self, url: str, version: str) -> None:
         self.update_link.setText(_("New version {version}").format(version=version))

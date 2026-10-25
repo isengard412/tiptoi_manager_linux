@@ -99,6 +99,13 @@ class LookupTests(unittest.TestCase):
         )
         self.assertIn("memory rekorde im tierreich happy meal edition", index.items)
 
+    def test_portal_page_url_is_captured(self) -> None:
+        index = parse_portal_links(PORTAL_FIXTURE)
+        # the "Adventskalender Mandelmann" entry carries its own service-portal page URL
+        page = index.pages["adventskalender mandelmann"]
+        self.assertTrue(page.startswith("https://service.ravensburger.de/"))
+        self.assertIn("Mandelmann_00037", page)
+
 
 class CoverPathTests(unittest.TestCase):
     def test_download_cover_uses_cache(self) -> None:

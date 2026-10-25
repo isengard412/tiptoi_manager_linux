@@ -16,6 +16,13 @@ def _preferred_languages() -> list[str] | None:
     override = os.environ.get("TIPTOI_LANGUAGE")
     if override:
         return [override, "en"]
+    # LANGUAGE / LC_ALL / LC_MESSAGES are explicit launch-time overrides (used by tests and
+    # scripts). Defer to gettext's own env handling when any is set, so "LANGUAGE=C" keeps
+    # pinning English regardless of a user's saved setting.
+    for var in ("LANGUAGE", "LC_ALL", "LC_MESSAGES"):
+        if os.environ.get(var):
+            return None
+    # No explicit locale on the command line - honour the in-app language setting, if any.
     try:  # local import: settings must not depend on i18n
         from tiptoi_linux.settings import load_settings
 

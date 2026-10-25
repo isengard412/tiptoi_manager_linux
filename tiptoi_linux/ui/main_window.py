@@ -7,6 +7,8 @@ orange header with pen card, left nav rail, stacked screens, footer.
 
 from __future__ import annotations
 
+import functools
+import subprocess
 import webbrowser
 from pathlib import Path
 from typing import TypeVar
@@ -48,18 +50,49 @@ from tiptoi_linux.ui import detail, theme, tiles, widgets
 
 T = TypeVar("T")
 
-PRIVACY_URL = "https://assets.ravensburger.com/legal/privacy/tiptoi_desktop/privacy_german.html"
-TERMS_URL = "https://assets.ravensburger.com/legal/terms/tiptoi_desktop/terms_german.html"
+GITHUB_URL = "https://github.com/isengard412/tiptoi_manager_linux"
+TIPTOI_HOME_URL = "https://www.ravensburger.de/de-DE/entdecken/tiptoi"
+TIPTOI_MANAGER_URL = "https://www.ravensburger.de/de-DE/entdecken/tiptoi/tiptoi-manager"
 FAQ_URL = "https://service.ravensburger.de/tiptoi%C2%AE/Produkte_FAQs"
 SUPPORT_URL = "https://service.ravensburger.de/tiptoi%C2%AE/tiptoi%C2%AE_Audiodateien"
-STATION_URL = "https://tiptoi.de/ladestation"
+STATION_URL = "https://www.ravensburger.de/de-DE/produkte/tiptoi/tiptoi-stift-und-starter-sets/ladestation-fuer-stift-00111"
 WLAN_URL = "https://tiptoi.de/wlan"
 
 NAV_DOWNLOAD, NAV_CATALOG, NAV_AUDIOBOOKS, NAV_PEN, NAV_HELP = range(5)
 
 
+def _git_describe() -> str | None:
+    """Best-effort git state for the version line when running from a checkout."""
+    try:
+        repo = Path(__file__).resolve().parent.parent.parent
+        result = subprocess.run(
+            ["git", "describe", "--tags", "--always", "--dirty"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            timeout=3,
+        )
+        if result.returncode == 0:
+            return result.stdout.strip() or None
+    except Exception:
+        pass
+    return None
+
+
+@functools.lru_cache(maxsize=1)
+def runtime_version() -> str:
+    """The version to show: the stamped release, or git describe while developing."""
+    version = __version__
+    if "dev" not in version:
+        return version
+    described = _git_describe()
+    if described and described != version:
+        return described if described.startswith("v") else f"{version}+{described}"
+    return version
+
+
 def version_text() -> str:
-    return _("unofficial tiptoi Manager for Linux {version}").format(version=__version__)
+    return _("unofficial tiptoi Manager for Linux {version}").format(version=runtime_version())
 
 
 class DownloadScreen(QWidget):
@@ -115,15 +148,29 @@ class PlaceholderScreen(QWidget):
         super().__init__(parent)
         title = QLabel(headline)
         title.setObjectName("ResultCount")
+        title.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         body = QLabel(note)
         body.setObjectName("Placeholder")
         body.setWordWrap(True)
-        body.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
-        layout = QVBoxLayout(self)
-        layout.addStretch()
-        layout.addWidget(title, alignment=Qt.AlignmentFlag.AlignHCenter)
-        layout.addWidget(body, alignment=Qt.AlignmentFlag.AlignHCenter)
-        layout.addStretch()
+        # WHY: without a width bound a word-wrapped label reports a single-line hint and the
+        # text is clipped; AlignTop keeps the full multi-line text visible
+        body.setMaximumWidth(620)
+        body.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
+
+        column = QVBoxLayout()
+        column.setSpacing(12)
+        column.addWidget(title)
+        column.addWidget(body)
+
+        row = QHBoxLayout()
+        row.addStretch()
+        row.addLayout(column)
+        row.addStretch()
+
+        outer = QVBoxLayout(self)
+        outer.addStretch()
+        outer.addLayout(row)
+        outer.addStretch()
 
 
 class HelpScreen(QWidget):
@@ -140,12 +187,13 @@ class HelpScreen(QWidget):
         layout.addWidget(title)
 
         entries = (
+            (_("Official tiptoi homepage"), TIPTOI_HOME_URL),
+            (_("tiptoi Manager (download)"), TIPTOI_MANAGER_URL),
             (_("tiptoi FAQ"), FAQ_URL),
             (_("Manual audio file download"), SUPPORT_URL),
             (_("tiptoi charging station"), STATION_URL),
             (_("tiptoi Wi-Fi pen"), WLAN_URL),
-            (_("Privacy"), PRIVACY_URL),
-            (_("Legal notice"), TERMS_URL),
+            (_("Open source project (GitHub)"), GITHUB_URL),
         )
         for text, url in entries:
             button = QPushButton(f"• {text}")
@@ -221,8 +269,8 @@ class TiptoiWindow(QMainWindow):
         self._header = widgets.HeaderBar()
         self._nav = widgets.NavRail()
         self._footer = widgets.FooterBar(version_text())
-        self._footer.privacy_link.clicked.connect(lambda: webbrowser.open(PRIVACY_URL))
-        self._footer.imprint_link.clicked.connect(lambda: webbrowser.open(TERMS_URL))
+        self._footer.privacy_link.clicked.connect(self._show_privacy)
+        self._footer.imprint_link.clicked.connect(lambda: webbrowser.open(GITHUB_URL))
 
         self._progress_bar = QProgressBar()
         self._progress_bar.setRange(0, 100)
@@ -345,6 +393,7 @@ class TiptoiWindow(QMainWindow):
         self._connection: ConnectionState | Connected = ConnectionState.DISCONNECTED
         self._firmware_info = None  # FirmwareInfo | None
         self._pen_fields: dict[str, str] = {}
+        self._portal_pages: dict[str, str] = {}
         self._update_queue: list[Product] = []
         self._update_chain_active = False
         self._outdated_count = 0
@@ -491,6 +540,7 @@ class TiptoiWindow(QMainWindow):
             mapping, index = outcome
             if mapping:
                 self._model.set_items(mapping)
+                self._portal_pages = index.pages
                 categories = sorted(set(index.categories.values()))
                 self.catalog_screen.set_categories(categories)
                 self._catalog_proxy.set_mapping(mapping, index.categories)
@@ -542,6 +592,7 @@ class TiptoiWindow(QMainWindow):
             pixmap=self._model.cover_for(product),
             installed=self._model.is_installed(product),
             can_install=self._pen_idle(),
+            page_url=self._portal_pages.get(product.name),
         )
 
     def _pen(self) -> Pen | None:
@@ -821,7 +872,22 @@ class TiptoiWindow(QMainWindow):
                 "Community project based on tiptoi-linux by tokajer (GPL-3.0).\n"
                 "This program is not affiliated with or endorsed by Ravensburger; "
                 "\"tiptoi\" is a trademark of Ravensburger AG."
-            ).format(version=__version__),
+            ).format(version=runtime_version()),
+        )
+
+    def _show_privacy(self) -> None:
+        QMessageBox.information(
+            self,
+            _("Privacy"),
+            _(
+                "This program collects no personal data, contains no telemetry and never "
+                "uploads anything about you or your pen.\n\n"
+                "It only connects to Ravensburger's public servers to download the product "
+                "catalog, firmware information and cover images, which are cached locally on "
+                "this computer. The pen is accessed exclusively over USB.\n\n"
+                "This software is free and open source (GPL-3.0). Source code, license and "
+                "releases are published on GitHub:\n{github}"
+            ).format(github=GITHUB_URL),
         )
 
     # --- firmware ------------------------------------------------------------
@@ -936,7 +1002,7 @@ class TiptoiWindow(QMainWindow):
         )
 
     def _update_footer_info(self) -> None:
-        parts = [_("unofficial tiptoi Manager for Linux {version}").format(version=__version__)]
+        parts = [_("unofficial tiptoi Manager for Linux {version}").format(version=runtime_version())]
         if isinstance(self._connection, Connected):
             serial = self._log_field(self._SERIAL_LOG_KEYS)
             firmware = self._log_field(self._FIRMWARE_LOG_KEYS)
