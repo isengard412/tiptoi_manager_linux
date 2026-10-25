@@ -5,7 +5,7 @@ readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1
 readonly REPO_ROOT="$(dirname -- "$SCRIPT_DIR")"
 # WHY: a relative path here makes podman reject the bind mount (it requires an absolute host
 # path), which podman then reports as a mount failure that looks like an unrelated artifact problem.
-readonly APPIMAGE_PATH="$(realpath -- "${1:-${REPO_ROOT}/tiptoi-x86_64.AppImage}")"
+readonly APPIMAGE_PATH="$(realpath -- "${1:-${REPO_ROOT}/tiptoi_manager.AppImage}")"
 readonly DISTROS=(ubuntu:22.04 debian:12)
 
 if ! command -v podman >/dev/null 2>&1; then
@@ -40,9 +40,9 @@ apt-get install -y --no-install-recommends \
 
 mkdir -p /work
 cd /work
-cp /appimage/tiptoi.AppImage ./tiptoi.AppImage
-chmod +x ./tiptoi.AppImage
-./tiptoi.AppImage --appimage-extract >/dev/null
+cp /appimage/tiptoi_manager.AppImage ./tiptoi_manager.AppImage
+chmod +x ./tiptoi_manager.AppImage
+./tiptoi_manager.AppImage --appimage-extract >/dev/null
 
 PYBIN="./squashfs-root/opt/python3.12/bin/python3.12"
 CERTS="./squashfs-root/opt/_internal/certs.pem"
@@ -85,7 +85,7 @@ overall_status=0
 for distro in "${DISTROS[@]}"; do
     echo "==> smoke test: ${distro}"
     if output=$(podman run --rm \
-        -v "${APPIMAGE_PATH}:/appimage/tiptoi.AppImage:ro" \
+        -v "${APPIMAGE_PATH}:/appimage/tiptoi_manager.AppImage:ro" \
         "${distro}" \
         bash -c "$CONTAINER_SCRIPT" 2>&1); then
         qt_line=$(printf '%s\n' "$output" | grep -o 'QT_VERSION_OK:[^[:space:]]*' || true)

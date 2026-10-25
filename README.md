@@ -57,13 +57,13 @@ you mount the pen in your file manager instead).
 
 ### AppImage
 
-Download `tiptoi-<version>-x86_64.AppImage` from the
+Download `tiptoi_manager.AppImage` from the
 [Releases](https://github.com/isengard412/tiptoi_manager_linux/releases) page, then:
 
 ```
 sha256sum -c SHA256SUMS          # optional: verify the download
-chmod +x tiptoi-*-x86_64.AppImage
-./tiptoi-*-x86_64.AppImage
+chmod +x tiptoi_manager.AppImage
+./tiptoi_manager.AppImage
 ```
 
 The AppImage bundles Python and Qt and needs nothing else. Each release is

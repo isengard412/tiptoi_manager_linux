@@ -16,7 +16,7 @@ readonly REPO_ROOT="$(dirname -- "$SCRIPT_DIR")"
 readonly BUILD_DIR="${SCRIPT_DIR}/build"
 readonly CACHE_DIR="${BUILD_DIR}/cache"
 readonly WORK_DIR="${BUILD_DIR}/work"
-readonly OUTPUT_APPIMAGE="${REPO_ROOT}/tiptoi-x86_64.AppImage"
+readonly OUTPUT_APPIMAGE="${REPO_ROOT}/tiptoi_manager.AppImage"
 
 readonly UNUSED_QT_FAMILIES=(
     Qml Quick Designer Test Sql Multimedia Pdf Charts DataVisualization 3D

@@ -166,8 +166,8 @@ jobs:
           EXISTS: ${{ needs.resolve.outputs.exists }}
           PRERELEASE: ${{ inputs.prerelease }}
         run: |
-          asset="tiptoi-${VERSION}-x86_64.AppImage"
-          mv tiptoi-x86_64.AppImage "$asset"
+          # fixed asset name - the version is tracked by the release tag, not the filename
+          asset="tiptoi_manager.AppImage"
           sha256sum "$asset" > SHA256SUMS
           if [ "$EXISTS" = "true" ]; then
             # WHY: no --clobber - a re-run must not silently replace an AppImage users may
