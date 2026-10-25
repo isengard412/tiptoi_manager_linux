@@ -3,7 +3,7 @@
 # by Ravensburger AG. "tiptoi" is a trademark of Ravensburger AG.
 
 pkgname=tiptoi-manager-linux-bin
-pkgver=0.1.3
+pkgver=0.1.4
 pkgrel=1
 pkgdesc="Unofficial tiptoi Manager for Linux (look-alike of the official Ravensburger manager)"
 arch=('x86_64')
@@ -16,7 +16,7 @@ source=(
   "SHA256SUMS::https://github.com/isengard412/tiptoi_manager_linux/releases/download/v${pkgver}/SHA256SUMS"
 )
 sha256sums=(
-  '5b92201ec4c99c3371ad1366e04d8087678e3103a4c2d9e89ac9a1d146f8f416'
+  '41dbc3a3d81eeaba45874db21df02671c442e35d53bf632bfa9249c1af7cef8a'
   'SKIP'
 )
 
@@ -37,9 +37,10 @@ package() {
   # desktop entry, icons and metainfo come straight out of the AppImage so they
   # always match the release; only the Exec line (AppRun) is rewritten to the
   # installed binary name.
-  sed 's|^Exec=.*|Exec=tiptoi-manager %U|' squashfs-root/tiptoi.desktop \
-    > "${pkgdir}/usr/share/applications/tiptoi.desktop"
-  chmod 0644 "${pkgdir}/usr/share/applications/tiptoi.desktop"
+  install -Dm644 squashfs-root/tiptoi.desktop \
+    "${pkgdir}/usr/share/applications/tiptoi.desktop"
+  sed -i 's|^Exec=.*|Exec=tiptoi-manager %U|' \
+    "${pkgdir}/usr/share/applications/tiptoi.desktop"
 
   install -Dm644 squashfs-root/usr/share/icons/hicolor/128x128/apps/tiptoi.png \
     "${pkgdir}/usr/share/icons/hicolor/128x128/apps/tiptoi.png"

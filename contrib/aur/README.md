@@ -34,7 +34,7 @@ Arch Linux package (`tiptoi-manager-linux-bin`).
 
    ```
    git add PKGBUILD .SRCINFO
-   git commit -m "tiptoi-manager-linux-bin 0.1.3"
+   git commit -m "tiptoi-manager-linux-bin 0.1.4"
    git push origin master
    ```
 
