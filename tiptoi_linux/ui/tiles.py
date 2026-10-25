@@ -112,7 +112,7 @@ class TileDelegate(QStyledItemDelegate):
         cover = cell.adjusted(0, 0, 0, -(LABEL_HEIGHT - 8))
 
         source = self._source(index)
-        product = source.product_at(index.row()) if source is not None else None
+        product = self._product_for(index)
 
         # cover card
         path = QPainterPath()
@@ -173,6 +173,18 @@ class TileDelegate(QStyledItemDelegate):
         text = metrics.elidedText(name.replace("_", " "), Qt.TextElideMode.ElideRight, label_rect.width())
         painter.drawText(label_rect, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop, text)
 
+    def _product_for(self, index: QModelIndex | QPersistentModelIndex) -> Product | None:
+        """The product a (possibly filtered/sorted) view index refers to."""
+        source = self._source(index)
+        if source is None:
+            return None
+        # WHY: index is a PROXY index; product_at expects a SOURCE row. Without mapping,
+        # any active filter shifts every cover onto the wrong tile.
+        model = index.model()
+        map_to_source = getattr(model, "mapToSource", None)
+        source_row = map_to_source(index).row() if map_to_source is not None else index.row()
+        return source.product_at(source_row)
+
     def _source(self, index: QModelIndex | QPersistentModelIndex) -> CoverTableModel | None:
         model = index.model()
         source = getattr(model, "sourceModel", lambda: None)()
@@ -218,17 +230,13 @@ class NewestStrip(QWidget):
             button.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
             button.setFixedSize(120, 160)
             pixmap = cover_provider(product)
-            if pixmap is not None and not pixmap.isNull():
-                button.setIcon(
-                    QIcon(
-                        pixmap.scaled(
-                            QSize(110, 120),
-                            Qt.AspectRatioMode.KeepAspectRatio,
-                            Qt.TransformationMode.SmoothTransformation,
-                        )
-                    )
-                )
-                button.setIconSize(QSize(110, 120))
+            if pixmap is not None and pixmap.isNull():
+                pixmap = None
+            if pixmap is None:
+                # blank white tiles look broken; use the same initials placeholder as the grid
+                pixmap = _placeholder_cover(product.name, QSize(110, 120))
+            button.setIcon(QIcon(pixmap))
+            button.setIconSize(QSize(110, 120))
             name = product.name.replace("_", " ")
             button.setText(name if len(name) <= 18 else name[:17] + "…")
             button.setCursor(Qt.CursorShape.PointingHandCursor)

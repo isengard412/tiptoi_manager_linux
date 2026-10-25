@@ -37,7 +37,14 @@ _TITLE_PREFIX_RE = re.compile(
     r"^(?:tiptoi\s*(?:®|&reg;)?\s*)?(?:audiodatei(?:en)?|audioatei(?:en)?)\s+", re.IGNORECASE
 )
 _NUMBER_TOKEN_RE = re.compile(r"^(?:\d{2,5}(?:[./-]\d{2,5})*|\d{4,5})$")
+_INNER_ARTICLE_RE = re.compile(r"(?<!\d)\d{5}(?:\s+und)?(?!\d)")
 _CONNECTOR_TOKENS = frozenset({"und", "u.", "u"})
+
+# CSV file names use series abbreviations the portal spells out in full.
+NAME_ALIAS_PREFIXES = (
+    ("www ", "wieso weshalb warum "),
+    ("lsw ", "meine lern spiel welt "),
+)
 
 
 class EnrichError(TiptoiError):
@@ -94,34 +101,53 @@ class PortalIndex:
         name = normalize_name(product_name)
         if not name:
             return None
-        if name in self.items:
-            return self.items[name]
-        key = name.replace(" ", "")
-        if key in self.compact:
-            return self.compact[key]
-        query = name.split()
-        if len(query) >= 2:
-            hits = set()
+        variants = [name]
+        for prefix, expansion in NAME_ALIAS_PREFIXES:
+            if name.startswith(prefix):
+                variants.append(expansion + name[len(prefix) :])
+        for variant in variants:
+            if variant in self.items:
+                return self.items[variant]
+            key = variant.replace(" ", "")
+            if key in self.compact:
+                return self.compact[key]
+
+        # token stages: subsequence or set containment, with a numeric guard so
+        # "Mathe Klasse 1" can never match "Mathe Klasse 2"
+        hits: set[str] = set()
+        for variant in variants:
+            query = variant.split()
+            if len(query) < 2:
+                continue
+            query_numbers = sorted(t for t in query if t.isdigit())
             for candidate, item in self.items.items():
                 tokens = candidate.split()
                 if len(tokens) < 2:
                     continue
-                shorter, longer = (query, tokens) if len(query) <= len(tokens) else (tokens, query)
-                if len(shorter) / len(longer) < 0.6:
+                if sorted(t for t in tokens if t.isdigit()) != query_numbers:
                     continue
-                if _is_subsequence(shorter, longer):
+                shorter, longer = (query, tokens) if len(query) <= len(tokens) else (tokens, query)
+                if len(shorter) / len(longer) < 0.5:
+                    continue
+                if _is_subsequence(shorter, longer) or set(shorter) <= set(longer):
                     hits.add(item)
-            if len(hits) == 1:
-                return hits.pop()
-            if hits:
-                # several portal entries could be this product - refuse to guess
-                return None
+        if len(hits) == 1:
+            return hits.pop()
+        if hits:
+            # several portal entries could be this product - refuse to guess
+            return None
+
         best_item: str | None = None
         best_ratio = 0.0
-        for candidate, item in self.items.items():
-            ratio = SequenceMatcher(None, key, candidate.replace(" ", "")).ratio()
-            if ratio > best_ratio:
-                best_item, best_ratio = item, ratio
+        for variant in variants:
+            key = variant.replace(" ", "")
+            query_numbers = sorted(t for t in variant.split() if t.isdigit())
+            for candidate, item in self.items.items():
+                if sorted(t for t in candidate.split() if t.isdigit()) != query_numbers:
+                    continue
+                ratio = SequenceMatcher(None, key, candidate.replace(" ", "")).ratio()
+                if ratio > best_ratio:
+                    best_item, best_ratio = item, ratio
         if best_ratio >= 0.85:
             return best_item
         return None
@@ -142,6 +168,8 @@ def _clean_anchor_text(text: str) -> str:
 
     plain = html_module.unescape(_TAG_RE.sub(" ", text)).replace("\xa0", " ")
     plain = _TITLE_PREFIX_RE.sub("", plain.strip())
+    # article references embedded mid-title ("memory X 00519 und Y") are not part of the name
+    plain = _INNER_ARTICLE_RE.sub(" ", plain)
     tokens = plain.split()
     while tokens and (
         _NUMBER_TOKEN_RE.match(tokens[-1]) or tokens[-1].lower() in _CONNECTOR_TOKENS

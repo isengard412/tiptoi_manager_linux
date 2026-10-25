@@ -422,6 +422,7 @@ if _PYSIDE6_IMPORT_ERROR is None:
             super().__init__(parent)
 
             self.space_bar = QProgressBar()
+            self.space_bar.setObjectName("penSpaceBar")
             self.space_bar.setAccessibleName(_("Pen storage"))
             self.space_bar.setRange(0, 100)
 
@@ -454,6 +455,9 @@ if _PYSIDE6_IMPORT_ERROR is None:
             detect_row = QHBoxLayout()
             detect_row.addWidget(self.detect_button)
             detect_row.addWidget(self.choose_button)
+            # WHY: without the stretch the two buttons balloon to full width in the
+            # new pill theme and look nothing like the rest of the UI
+            detect_row.addStretch()
 
             layout = QVBoxLayout(self)
             layout.addWidget(QLabel(_("Storage")))
@@ -463,13 +467,14 @@ if _PYSIDE6_IMPORT_ERROR is None:
             layout.addWidget(self.installed_list)
             layout.addWidget(self.outdated_label)
             layout.addWidget(self.outdated_list)
-            layout.addWidget(self.delete_button)
+            layout.addWidget(self.delete_button, alignment=Qt.AlignmentFlag.AlignLeft)
             self.setMinimumWidth(250)
 
             self._installed_names: tuple[str, ...] = ()
             self.reset()
 
         def show_summary(self, summary: PenSummary) -> None:
+            self._set_space_bar_empty(False)
             self._show_installed(summary.installed)
             self._show_space(summary.free, summary.total)
             self.outdated_list.clear()
@@ -478,6 +483,7 @@ if _PYSIDE6_IMPORT_ERROR is None:
             self.outdated_label.setText(_outdated_label_text(len(summary.outdated)))
 
         def reset(self) -> None:
+            self._set_space_bar_empty(True)
             self._installed_names = ()
             self.installed_list.clear()
             self.outdated_list.clear()
@@ -485,6 +491,16 @@ if _PYSIDE6_IMPORT_ERROR is None:
             self.outdated_label.setText(_outdated_label_text(0))
             self.space_bar.setValue(0)
             self.space_bar.setFormat("—")
+
+        def _set_space_bar_empty(self, empty: bool) -> None:
+            # WHY: a 0-value rounded chunk still paints a small orange sliver; hide it
+            # via the [empty] property while no pen data is present
+            if self.space_bar.property("empty") == empty:
+                return
+            self.space_bar.setProperty("empty", empty)
+            style = self.space_bar.style()
+            style.unpolish(self.space_bar)
+            style.polish(self.space_bar)
 
         def selected_names(self) -> list[str]:
             return [item.text() for item in self.installed_list.selectedItems()]

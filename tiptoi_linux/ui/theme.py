@@ -210,6 +210,23 @@ def build_style_sheet() -> str:
         text-align: center;
     }}
     QProgressBar::chunk {{ background: {BRAND_ORANGE}; border-radius: 8px; }}
+    QProgressBar#penSpaceBar[empty="true"]::chunk {{ background: transparent; }}
+
+    /* --- legacy pen panel restyled for the pill theme ---------------------- */
+    PenPanel QPushButton {{
+        background: {BG_WHITE};
+        color: {BRAND_ORANGE_DEEP};
+        border: 2px solid {BRAND_ORANGE};
+        border-radius: 15px;
+        padding: 5px 16px;
+        font-size: 13px;
+        font-weight: 700;
+    }}
+    PenPanel QPushButton:hover {{ background: {HEADER_ORANGE_SOFT}; }}
+    PenPanel QPushButton:disabled {{
+        color: #B5B5B5; border-color: {BORDER_LIGHT}; background: {BG_WHITE};
+    }}
+    PenPanel QLabel {{ background: transparent; font-weight: 600; }}
 
     /* --- footer ---------------------------------------------------------- */
     FooterBar {{ background: {BG_WHITE}; border-top: 1px solid {BORDER_LIGHT}; }}
@@ -222,6 +239,17 @@ def build_style_sheet() -> str:
     QPushButton#FooterLink:hover {{ color: {BRAND_ORANGE_DEEP}; }}
 
     QLabel#Placeholder {{ color: {TEXT_GRAY}; font-size: 14px; }}
+
+    QScrollArea QScrollBar:horizontal {{
+        height: 8px; background: transparent; margin: 2px 0;
+    }}
+    QScrollArea QScrollBar::handle:horizontal {{
+        background: #D6DEE3; border-radius: 4px; min-width: 30px;
+    }}
+    QScrollArea QScrollBar::add-line:horizontal,
+    QScrollArea QScrollBar::sub-line:horizontal {{ width: 0; }}
+    QScrollArea QScrollBar::add-page:horizontal,
+    QScrollArea QScrollBar::sub-page:horizontal {{ background: transparent; }}
 
     /* --- detail overlay ---------------------------------------------------- */
     QWidget#DetailCard {{

@@ -85,7 +85,6 @@ class DetailOverlay(QWidget):
         info.addWidget(self.state_label)
         info.addSpacing(10)
         info.addLayout(buttons)
-        info.addStretch()
 
         header = QHBoxLayout()
         header.addLayout(info, stretch=1)
@@ -133,7 +132,10 @@ class DetailOverlay(QWidget):
                 )
             )
         else:
-            self.cover.setText("")
+            from PySide6.QtCore import QSize
+            from tiptoi_linux.ui.tiles import _placeholder_cover
+
+            self.cover.setPixmap(_placeholder_cover(product.name, QSize(240, 280)))
         self.state_label.setText(_("Installed on the pen") if installed else "")
         self.install_button.setText(_("Installed") if installed else _("Install on pen"))
         self.install_button.setEnabled(can_install and not installed)

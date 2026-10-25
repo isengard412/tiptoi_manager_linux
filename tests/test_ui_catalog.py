@@ -94,6 +94,30 @@ class CatalogScreenTests(unittest.TestCase):
         self.assertIsNotNone(product)
         self.assertEqual(product.name, "Die Eiskoenigin")
 
+    def test_delegate_maps_filtered_proxy_rows_to_source_products(self) -> None:
+        """WHY: a regression where the tile delegate used proxy rows as source rows,
+        so any active filter shifted every cover onto the wrong product."""
+        from tiptoi_linux.ui import tiles
+
+        mapping = {p.name: f"0{i}" for i, p in enumerate(self.catalog.products)}
+        self.model.set_items(mapping)
+        delegate = tiles.TileDelegate(self.screen.grid)
+
+        self.proxy.set_search("Eiskoenigin")
+        self.assertEqual(self.proxy.rowCount(), 1)
+        view_index = self.proxy.index(0, 0)
+        product = delegate._product_for(view_index)
+        self.assertIsNotNone(product)
+        self.assertEqual(product.name, "Die Eiskoenigin")
+
+        self.proxy.set_search("")
+        # with sorting on the download proxy the rows can differ; check every row maps right
+        for row in range(self.proxy.rowCount()):
+            idx = self.proxy.index(row, 0)
+            p = delegate._product_for(idx)
+            src = self.proxy.mapToSource(idx)
+            self.assertEqual(p, self.model.product_at(src.row()))
+
 
 if __name__ == "__main__":
     unittest.main()

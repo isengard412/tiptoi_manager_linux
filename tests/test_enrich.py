@@ -76,6 +76,29 @@ class LookupTests(unittest.TestCase):
         )
         self.assertIsNone(index.item_for("puzzle tier"))
 
+    def test_series_alias_prefix(self) -> None:
+        index = PortalIndex(items={"wieso weshalb warum bei der polizei": "49304"})
+        self.assertEqual(index.item_for("WWW_Bei_der_Polizei"), "49304")
+
+    def test_numeric_guard_rejects_wrong_class_number(self) -> None:
+        index = PortalIndex(
+            items={"lern mit mir mathe 1 klasse": "49284", "mathe 2 klasse": "41807"},
+        )
+        self.assertEqual(index.item_for("Lern mit mir - Mathe - Klasse 2"), "41807")
+        self.assertEqual(index.item_for("Lern mit mir - Mathe - Klasse 1"), "49284")
+
+    def test_token_set_match_ignores_word_order(self) -> None:
+        index = PortalIndex(items={"deutsch 1 klasse": "49283"})
+        self.assertEqual(index.item_for("Lern mit mir - Deutsch - Klasse 1"), "49283")
+
+    def test_inner_article_numbers_stripped(self) -> None:
+        index = parse_portal_links(
+            '<a href="https://service.ravensburger.de/tiptoi%C2%AE/tiptoi%C2%AE_Audiodateien/'
+            'Audiodateien_tiptoi%C2%AE_Spiele/Memory_Rekorde_im_Tierreich_80671">'
+            'tiptoi&reg; Audiodatei Memory Rekorde im Tierreich 00519 und Happy Meal Edition</a>'
+        )
+        self.assertIn("memory rekorde im tierreich happy meal edition", index.items)
+
 
 class CoverPathTests(unittest.TestCase):
     def test_download_cover_uses_cache(self) -> None:
