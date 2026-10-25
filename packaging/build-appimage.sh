@@ -111,13 +111,13 @@ download_verified() {
 }
 
 convert_icon() {
-    local svg="$1" png="$2"
+    local svg="$1" png="$2" size="${3:-256}"
     if command -v magick >/dev/null 2>&1; then
-        magick -background none -density 384 "$svg" -resize 256x256 "$png"
+        magick -background none -density 384 "$svg" -resize "${size}x${size}" "$png"
     elif command -v convert >/dev/null 2>&1; then
-        convert -background none -density 384 "$svg" -resize 256x256 "$png"
+        convert -background none -density 384 "$svg" -resize "${size}x${size}" "$png"
     elif command -v inkscape >/dev/null 2>&1; then
-        inkscape "$svg" --export-type=png --export-filename="$png" -w 256 -h 256
+        inkscape "$svg" --export-type=png --export-filename="$png" -w "$size" -h "$size"
     else
         echo "error: none of magick, convert, or inkscape found; cannot rasterize the icon" >&2
         exit 1
@@ -453,12 +453,23 @@ main() {
 
     log "converting icon"
     local icon_png="${WORK_DIR}/tiptoi.png"
-    convert_icon "${SCRIPT_DIR}/tiptoi.svg" "$icon_png"
+    convert_icon "${SCRIPT_DIR}/tiptoi.svg" "$icon_png" 256
 
     mkdir -p "${appdir}/usr/share/icons/hicolor/256x256/apps"
     install -m 644 "$icon_png" "${appdir}/usr/share/icons/hicolor/256x256/apps/tiptoi.png"
     install -m 644 "$icon_png" "${appdir}/tiptoi.png"
     install -m 644 "$icon_png" "${appdir}/.DirIcon"
+
+    # courtesy sizes + a scalable copy so launchers and docks find a crisp icon at any DPI
+    local icon_128="${WORK_DIR}/tiptoi-128.png" icon_512="${WORK_DIR}/tiptoi-512.png"
+    convert_icon "${SCRIPT_DIR}/tiptoi.svg" "$icon_128" 128
+    convert_icon "${SCRIPT_DIR}/tiptoi.svg" "$icon_512" 512
+    mkdir -p "${appdir}/usr/share/icons/hicolor/128x128/apps" \
+             "${appdir}/usr/share/icons/hicolor/512x512/apps" \
+             "${appdir}/usr/share/icons/hicolor/scalable/apps"
+    install -m 644 "$icon_128" "${appdir}/usr/share/icons/hicolor/128x128/apps/tiptoi.png"
+    install -m 644 "$icon_512" "${appdir}/usr/share/icons/hicolor/512x512/apps/tiptoi.png"
+    install -m 644 "${SCRIPT_DIR}/tiptoi.svg" "${appdir}/usr/share/icons/hicolor/scalable/apps/tiptoi.svg"
 
     trim_appdir "$appdir" "$site"
     verify_appdir "$pybin" "$certs" "$qt_dir"
