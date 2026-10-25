@@ -1,39 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
-  <!-- Original identity mark for the unofficial tiptoi Manager for Linux.
-       An "audio pen": a stylised nib with sound arcs, in the app's own
-       orange/teal/cream palette. No trademarked artwork is reproduced. -->
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ffc14d"/>
-      <stop offset="1" stop-color="#f7a900"/>
-    </linearGradient>
-  </defs>
-
-  <!-- background -->
-  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
-
-  <!-- sound arcs, cream -->
-  <g fill="none" stroke="#f6efe3" stroke-linecap="round">
-    <path d="M70 126 a54 54 0 0 0 0 74" stroke-width="11"/>
-    <path d="M58 138 a26 26 0 0 0 0 36" stroke-width="11"/>
-    <circle cx="106" cy="176" r="7" fill="#f6efe3" stroke="none"/>
-  </g>
-
-  <!-- the pen nib, dark teal -->
-  <g>
-    <path d="M198 96 q6 60 -8 78 l-12 4 -32 -40 20 -56 z" fill="#497a88"/>
-    <!-- body -->
-    <path d="M118 88 l96 -54 12 12 -54 96 z" fill="#ffffff"/>
-    <!-- lighter top band -->
-    <path d="M190 46 l20 20 -6 10 -20 -20 z" fill="#cfe0e6" opacity="0.9"/>
-    <!-- tip accent -->
-    <circle cx="126" cy="168" r="10" fill="#233047"/>
-  </g>
-
-  <!-- three small audio dots -->
-  <g fill="#233047">
-    <circle cx="86" cy="92" r="6"/>
-    <circle cx="104" cy="108" r="5"/>
-    <circle cx="88" cy="126" r="4"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="256" height="256" viewBox="0 0 256 256">
+  <title>tiptoi Manager for Linux — app icon (original artwork)</title>
+  <g id="Layer_1" data-name="Layer 1">
+    <path id="bg" d="M56 0 L200 0 C230.928 0 256 25.072 256 56 L256 200 C256 230.928 230.928 256 200 256 L56 256 C25.072 256 0 230.928 0 200 L0 56 C0 25.072 25.072 0 56 0 Z" fill="#f7a900"/>
+    <path id="pen-body" d="M149 40 L149 40 C157.284 40 164 46.716 164 55 L164 155 C164 163.284 157.284 170 149 170 L149 170 C140.716 170 134 163.284 134 155 L134 55 C134 46.716 140.716 40 149 40 Z" fill="#ffffff"/>
+    <path id="nib" d="M120 170 L178 170 L149 228 Z" fill="#497a88"/>
+    <path id="tip" d="M143 230 C143 226.686 145.686 224 149 224 C152.314 224 155 226.686 155 230 C155 233.314 152.314 236 149 236 C145.686 236 143 233.314 143 230 Z" fill="#f6efe3"/>
+    <path id="wave-30" d="M120.8 217.7 C126.617 227.816 137.773 233.642 149.399 232.633 C161.025 231.625 171.011 223.967 175 213" fill="none" stroke="#f6efe3" stroke-width="12" stroke-miterlimit="10"/>
+    <path id="wave-46" d="M107.3 208.6 C114.851 224.814 131.115 235.181 149 235.181 C166.885 235.181 183.149 224.814 190.7 208.6" fill="none" stroke="#f6efe3" stroke-width="12" stroke-miterlimit="10"/>
+    <path id="wave-62" d="M95.3 197 C103.528 219.668 124.152 235.508 148.175 237.61 C172.198 239.712 195.261 227.694 207.3 206.8" fill="none" stroke="#f6efe3" stroke-width="12" stroke-miterlimit="10"/>
   </g>
 </svg>
