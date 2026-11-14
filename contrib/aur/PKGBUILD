@@ -1,9 +1,9 @@
-# Maintainer: Your Name <you@example.com>
+# Maintainer: isengard412 <isengard412@users.noreply.github.com>
 # An unofficial, community-maintained package. Not affiliated with or endorsed
 # by Ravensburger AG. "tiptoi" is a trademark of Ravensburger AG.
 
 pkgname=tiptoi-manager-linux-bin
-pkgver=0.1.4
+pkgver=0.1.5
 pkgrel=1
 pkgdesc="Unofficial tiptoi Manager for Linux (look-alike of the official Ravensburger manager)"
 arch=('x86_64')
@@ -16,7 +16,7 @@ source=(
   "SHA256SUMS::https://github.com/isengard412/tiptoi_manager_linux/releases/download/v${pkgver}/SHA256SUMS"
 )
 sha256sums=(
-  '41dbc3a3d81eeaba45874db21df02671c442e35d53bf632bfa9249c1af7cef8a'
+  '88d867a6d8dd429b5073606de1ec148994e01bb839f99914ffc5bc7883cb9b8e'
   'SKIP'
 )
 

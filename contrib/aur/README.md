@@ -18,7 +18,7 @@ Arch Linux package (`tiptoi-manager-linux-bin`).
    ```
    git clone ssh://aur@aur.archlinux.org/tiptoi-manager-linux-bin.git
    cd tiptoi-manager-linux-bin
-   cp /path/to/tip/toi_manager_linux/contrib/aur/PKGBUILD .
+   cp /path/to/tiptoi_manager_linux/contrib/aur/PKGBUILD .
    makepkg --printsrcinfo > .SRCINFO
    ```
 
@@ -34,7 +34,7 @@ Arch Linux package (`tiptoi-manager-linux-bin`).
 
    ```
    git add PKGBUILD .SRCINFO
-   git commit -m "tiptoi-manager-linux-bin 0.1.4"
+   git commit -m "tiptoi-manager-linux-bin 0.1.5"
    git push origin master
    ```
 
