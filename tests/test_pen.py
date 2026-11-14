@@ -391,6 +391,14 @@ class ReadGmeVersionTests(unittest.TestCase):
             path.write_bytes(_synthetic_gme("20260115"))
             self.assertEqual(pen.read_gme_version(path), "20260115")
 
+    def test_older_format_date_before_language_token(self) -> None:
+        # older .gme headers embed the date before a language token + trailing junk:
+        # "...Ver2.10.090120150819GERMANIz\x05"
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            path = Path(tmp_dir) / "title.gme"
+            path.write_bytes(b"\0" * 0x20 + _HEADER_PREFIX + b"20150819GERMANIz\x05" + b"\0" + b"\0" * 64)
+            self.assertEqual(pen.read_gme_version(path), "20150819")
+
     def test_short_file_yields_none(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             path = Path(tmp_dir) / "title.gme"

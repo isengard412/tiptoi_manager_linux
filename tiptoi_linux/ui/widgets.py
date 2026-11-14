@@ -311,7 +311,9 @@ class FirmwarePanel(QFrame):
         layout.addWidget(self.current_label)
         layout.addWidget(self.update_button, alignment=Qt.AlignmentFlag.AlignLeft)
 
-    def show_state(self, *, pen_version: str | None, latest_version: str | None, pending: bool, busy: bool) -> None:
+    def show_state(
+        self, *, pen_version: str | None, latest_version: str | None, pending: bool, busy: bool, compatible: bool = True
+    ) -> None:
         if pen_version is None:
             self.current_label.setText(_("Firmware-Version {version}").format(version="—"))
         else:
@@ -319,9 +321,14 @@ class FirmwarePanel(QFrame):
         if pending:
             self.current_label.setText(_("A firmware update is pending on the pen"))
             self.update_button.setEnabled(False)
-        elif latest_version and pen_version and latest_version != pen_version:
+        elif latest_version and pen_version and compatible and latest_version != pen_version:
             self.update_button.setText(_("Update firmware to {version}").format(version=latest_version))
             self.update_button.setEnabled(not busy)
+        elif latest_version and not compatible:
+            # WHY: the catalog firmware belongs to a different pen generation; flashing
+            # it would brick the pen, so the update must never be offered here
+            self.update_button.setText(_("Firmware update not available for this pen generation"))
+            self.update_button.setEnabled(False)
         elif latest_version:
             self.update_button.setText(_("Up to date"))
             self.update_button.setEnabled(False)

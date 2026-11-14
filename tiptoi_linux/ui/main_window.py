@@ -994,11 +994,24 @@ class TiptoiWindow(QMainWindow):
                 pending = (self._connection.pen.mountpoint / FIRMWARE_FILE_NAME).exists()
             except OSError:
                 pending = False
+        pen_version = self._log_field(self._FIRMWARE_LOG_KEYS) if connected else None
+        latest_version = self._firmware_info.version if self._firmware_info else None
+        compatible = True
+        if pen_version and latest_version:
+            from tiptoi_linux.pen import firmware_generation
+
+            pen_gen = firmware_generation(pen_version)
+            catalog_gen = firmware_generation(latest_version)
+            # WHY: a catalog firmware for another generation would brick the pen; only
+            # offer the update when the generation token matches (or is unparseable - then
+            # stay conservative and refuse rather than risk a wrong flash)
+            compatible = bool(pen_gen) and pen_gen == catalog_gen
         self.firmware_panel.show_state(
-            pen_version=self._log_field(self._FIRMWARE_LOG_KEYS) if connected else None,
-            latest_version=self._firmware_info.version if self._firmware_info else None,
+            pen_version=pen_version,
+            latest_version=latest_version,
             pending=pending,
             busy=self._pen_job.is_running,
+            compatible=compatible,
         )
 
     def _update_footer_info(self) -> None:

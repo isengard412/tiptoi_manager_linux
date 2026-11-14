@@ -676,3 +676,9 @@ msgstr "Projet open source (GitHub)"
 
 msgid "This program collects no personal data, contains no telemetry and never uploads anything about you or your pen.\n\nIt only connects to Ravensburger's public servers to download the product catalog, firmware information and cover images, which are cached locally on this computer. The pen is accessed exclusively over USB.\n\nThis software is free and open source (GPL-3.0). Source code, license and releases are published on GitHub:\n{github}"
 msgstr "Ce programme ne collecte aucune donnée personnelle, ne contient aucune télémétrie et n'envoie jamais rien vous concernant ni concernant votre stylo.\n\nIl se connecte uniquement aux serveurs publics de Ravensburger pour télécharger le catalogue, les informations de micrologiciel et les couvertures, mis en cache localement sur cet ordinateur. Le stylo n'est accessible que par USB.\n\nCe logiciel est libre et open source (GPL-3.0). Le code source, la licence et les versions sont publiés sur GitHub :\n{github}"
+
+msgid "Firmware update not available for this pen generation"
+msgstr "Mise à jour du micrologiciel indisponible pour cette génération de stylo"
+
+msgid "The catalog firmware is for a different pen generation - no update offered."
+msgstr "Le micrologiciel du catalogue ne correspond pas à cette génération de stylo - aucune mise à jour proposée."

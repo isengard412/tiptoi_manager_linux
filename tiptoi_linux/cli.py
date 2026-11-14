@@ -386,6 +386,16 @@ def _cmd_pen_firmware(args: argparse.Namespace) -> int:
     if current == info.version:
         print(_("The pen is up to date."))
         return 0
+
+    from tiptoi_linux.pen import firmware_generation
+
+    pen_gen = firmware_generation(current)
+    catalog_gen = firmware_generation(info.version)
+    if not pen_gen or pen_gen != catalog_gen:
+        # WHY: flashing a different generation's firmware would brick the pen - refuse
+        print(_("The catalog firmware is for a different pen generation - no update offered."))
+        return 0
+
     if not args.install:
         print(_("Run 'tiptoi pen firmware --install' to stage the update."))
         return 0

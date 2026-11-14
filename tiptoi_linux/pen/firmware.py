@@ -157,18 +157,60 @@ def install_firmware(pen: Pen, source: Path, *, info: FirmwareInfo) -> None:
         raise FirmwareError(_("cannot write firmware update to the pen: {error}").format(error=exc)) from exc
 
 
-def read_pen_log(pen: Pen) -> dict[str, str]:
-    """Parse the pen's .tiptoi.log key=value metadata (serialNumber, mcu, language, ...).
+_LOG_RECORD_SIZE = 16
+_LOG_RECORD_KEYS = ("serialNumber", "firmwareVersion", "language", "build")
+_FIRMWARE_GENERATION_RE = re.compile(r"^(\d)GE")
 
+
+def firmware_generation(version: str | None) -> str | None:
+    """The pen generation token ('7' in '7GE026'), or None when unrecognised.
+
+    The catalog offers one firmware per generation (e.g. 6GE027 / Update6E.upd).
+    Flashing a different generation would brick the pen, so updates may only be
+    offered when the generation matches.
+    """
+    if not version:
+        return None
+    match = _FIRMWARE_GENERATION_RE.match(version)
+    return match.group(1) if match else None
+
+
+def _log_records(data: bytes) -> list[str]:
+    """Decode .tiptoi.log's fixed-width 16-byte records.
+
+    Each record is a short ASCII string followed by 0x00/0xFF padding. Validated
+    against a real pen (2026-11-01): serial, firmware, language, build marker.
+    """
+    values: list[str] = []
+    for offset in range(0, len(data), _LOG_RECORD_SIZE):
+        record = data[offset : offset + _LOG_RECORD_SIZE]
+        end = next((i for i, byte in enumerate(record) if byte in (0x00, 0xFF)), len(record))
+        values.append(record[:end].decode("ascii", errors="replace").strip())
+    return values
+
+
+def read_pen_log(pen: Pen) -> dict[str, str]:
+    """Parse the pen's .tiptoi.log metadata (serial, firmware, language, ...).
+
+    Primary format: fixed-width 16-byte records (this generation of pen).
+    Fallback: the key=value line format other pen generations write.
     A missing or unreadable log yields an empty dict - the pen simply shows fewer details.
     """
     log_path = pen.mountpoint / ".tiptoi.log"
     try:
-        text = log_path.read_text(encoding="utf-8", errors="replace")
+        data = log_path.read_bytes()
     except OSError:
         return {}
     fields: dict[str, str] = {}
-    for line in text.splitlines():
+    if b"\x00" in data or b"\xff" in data:
+        for index, value in enumerate(_log_records(data)):
+            if not value:
+                continue
+            key = _LOG_RECORD_KEYS[index] if index < len(_LOG_RECORD_KEYS) else f"field{index}"
+            fields.setdefault(key, value)
+        if fields:
+            return fields
+    for line in data.decode("utf-8", errors="replace").splitlines():
         key, sep, value = line.partition("=")
         if sep and key.strip():
             fields.setdefault(key.strip(), value.strip())

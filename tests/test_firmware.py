@@ -13,6 +13,7 @@ from tiptoi_linux.pen.firmware import (
     FirmwareError,
     FirmwareInfo,
     checksum_of,
+    firmware_generation,
     install_firmware,
     parse_firmware_info,
     read_pen_log,
@@ -107,6 +108,50 @@ class PenLogTests(unittest.TestCase):
         self.addCleanup(tmp.cleanup)
         pen = Pen(mountpoint=Path(tmp.name), source=None)
         self.assertEqual(read_pen_log(pen), {})
+
+
+# Captured from a real tiptoi pen (2026-11-01): four fixed-width 16-byte records.
+REAL_PEN_LOG_HEX = (
+    "5650333530353737ffffffffffffffff"
+    "37474530323600000000ffffffffffff"
+    "4745524d414e00000000ffffffffffff"
+    "333230354c0000000000ffffffffffff"
+)
+
+
+class PenLogRecordFormatTests(unittest.TestCase):
+    def test_parses_fixed_width_records(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        pen = Pen(mountpoint=root, source=None)
+        (root / ".tiptoi.log").write_bytes(bytes.fromhex(REAL_PEN_LOG_HEX))
+        fields = read_pen_log(pen)
+        self.assertEqual(fields["serialNumber"], "VP350577")
+        self.assertEqual(fields["firmwareVersion"], "7GE026")
+        self.assertEqual(fields["language"], "GERMAN")
+        self.assertEqual(fields["build"], "3205L")
+
+    def test_key_value_fallback_when_no_record_padding(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        pen = Pen(mountpoint=root, source=None)
+        (root / ".tiptoi.log").write_text("serialNumber=123\nfirmwareversion=6GE027\n", encoding="utf-8")
+        fields = read_pen_log(pen)
+        self.assertEqual(fields["serialNumber"], "123")
+        self.assertEqual(fields["firmwareversion"], "6GE027")
+
+
+class FirmwareGenerationTests(unittest.TestCase):
+    def test_generation_token(self) -> None:
+        self.assertEqual(firmware_generation("7GE026"), "7")
+        self.assertEqual(firmware_generation("6GE027"), "6")
+
+    def test_unparseable_versions_have_no_generation(self) -> None:
+        self.assertIsNone(firmware_generation(None))
+        self.assertIsNone(firmware_generation(""))
+        self.assertIsNone(firmware_generation("garbage"))
 
 
 if __name__ == "__main__":

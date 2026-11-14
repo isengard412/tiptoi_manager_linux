@@ -235,6 +235,16 @@ class FirmwareShellTests(unittest.TestCase):
         self._connect()
         self.assertFalse(self.window.firmware_panel.update_button.isEnabled())
 
+    def test_cross_generation_update_is_refused(self) -> None:
+        # pen is generation 7 (7GE026), catalog offers generation 6 (6GE027)
+        (self.pen_dir / ".tiptoi.log").write_text(
+            "serialNumber=987654321\nfirmwareversion=7GE026\n", encoding="utf-8"
+        )
+        self._connect()
+        button = self.window.firmware_panel.update_button
+        self.assertFalse(button.isEnabled())
+        self.assertIn("generation", button.text().lower())
+
 
 @unittest.skipUnless(_PYSIDE6_AVAILABLE, "PySide6 is not installed")
 class UpdateChainTests(unittest.TestCase):
