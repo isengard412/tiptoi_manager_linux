@@ -682,3 +682,9 @@ msgstr "Firmware-update niet beschikbaar voor deze pen-generatie"
 
 msgid "The catalog firmware is for a different pen generation - no update offered."
 msgstr "De catalogus-firmware is voor een andere pen-generatie - geen update aangeboden."
+
+msgid "Mount"
+msgstr "Koppelen"
+
+msgid "Unmount"
+msgstr "Ontkoppelen"

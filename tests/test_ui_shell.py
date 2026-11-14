@@ -247,6 +247,130 @@ class FirmwareShellTests(unittest.TestCase):
 
 
 @unittest.skipUnless(_PYSIDE6_AVAILABLE, "PySide6 is not installed")
+class PenActionShellTests(unittest.TestCase):
+    """The upper-right Unmount/Mount button and the safely-unmounted state."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        from PySide6.QtWidgets import QApplication
+
+        cls.app = QApplication.instance() or QApplication([])
+
+    def setUp(self) -> None:
+        import tempfile
+
+        from tiptoi_linux.gui import Services
+        from tiptoi_linux.ui.main_window import TiptoiWindow
+
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.pen_dir = Path(self.tmp.name)
+        self.pen = Pen(mountpoint=self.pen_dir, source="/dev/sdb1")
+        self.unmounted: list[Pen] = []
+        self.mounted: list[bool] = []
+        self.services = Services(
+            load_catalog=lambda **kw: LoadedCatalog(parse_catalog(FIXTURE_CSV)),
+            find_pen=lambda **kw: self.pen,
+            mount_pen=self._fake_mount,
+            unmount_pen=self._fake_unmount,
+            pen_summary=lambda p, catalog: PenSummary(
+                pen=p, free=0, total=0, installed=(), outdated=[]
+            ),
+            device_plugged_in=lambda: True,
+            device_mounted=lambda: not self.unmounted,
+            pen_mount_alive=lambda p: not self.unmounted,
+        )
+        self.window = TiptoiWindow(
+            services=self.services,
+            portal_loader=lambda: PortalIndex({}),
+            cover_fetcher=lambda item: None,
+            release_loader=lambda: None,
+        )
+        self.window._poll_timer.stop()
+
+    def _fake_unmount(self, pen: Pen) -> None:
+        self.unmounted.append(pen)
+
+    def _fake_mount(self) -> Pen:
+        self.mounted.append(True)
+        self.unmounted.clear()
+        return self.pen
+
+    def tearDown(self) -> None:
+        destroy_window(self.app, self.window)
+
+    def _connect(self) -> None:
+        self.window._detect()
+        _pump_until_idle(self.app, self.window._pen_job)
+
+    def _click_action(self) -> None:
+        self.window._header.pen_action_button.click()
+        _pump_until_idle(self.app, self.window._pen_job)
+
+    def test_button_hidden_when_disconnected(self) -> None:
+        self.assertTrue(self.window._header.pen_action_button.isHidden())
+
+    def test_unmount_offered_when_connected(self) -> None:
+        self._connect()
+        button = self.window._header.pen_action_button
+        self.assertFalse(button.isHidden())
+        self.assertTrue(button.isEnabled())
+        self.assertEqual(button.text(), "Unmount")
+
+    def test_unmount_marks_pen_safe_to_unplug(self) -> None:
+        from tiptoi_linux.gui import ConnectionState
+
+        self._connect()
+        self._click_action()
+        self.assertEqual(self.unmounted, [self.pen])
+        self.assertIs(self.window._connection, ConnectionState.SAFELY_UNMOUNTED)
+        button = self.window._header.pen_action_button
+        self.assertEqual(button.text(), "Mount")
+        self.assertIn("Unmounted", self.window._header.pen_card.status_pill.text())
+        self.assertEqual(self.window._model._installed, frozenset())
+
+    def test_mount_after_unmount_reconnects(self) -> None:
+        from tiptoi_linux.gui import Connected
+
+        self._connect()
+        self._click_action()  # unmount
+        self._click_action()  # mount again
+        self.assertEqual(len(self.mounted), 1)
+        self.assertIsInstance(self.window._connection, Connected)
+        self.assertEqual(self.window._header.pen_action_button.text(), "Unmount")
+
+    def test_poll_does_not_auto_remount_after_safe_unmount(self) -> None:
+        from tiptoi_linux.gui import ConnectionState
+
+        self._connect()
+        self._click_action()
+        self.window._poll_pen()
+        self.assertIs(self.window._connection, ConnectionState.SAFELY_UNMOUNTED)
+        self.assertEqual(self.mounted, [])
+
+    def test_folder_pen_has_no_unmount_button(self) -> None:
+        self.pen = Pen(mountpoint=self.pen_dir, source=None)
+        self._connect()
+        self.assertTrue(self.window._header.pen_action_button.isHidden())
+
+    def test_unmount_failure_keeps_pen_connected(self) -> None:
+        from tiptoi_linux.gui import Connected
+        from tiptoi_linux.pen import PenError
+
+        errors: list[str] = []
+        self.window._show_error = errors.append  # avoid the modal warning box
+
+        def refuse(pen: Pen) -> None:
+            raise PenError("device busy")
+
+        self.services.unmount_pen = refuse
+        self._connect()
+        self._click_action()
+        self.assertIsInstance(self.window._connection, Connected)
+        self.assertEqual(len(errors), 1)
+
+
+@unittest.skipUnless(_PYSIDE6_AVAILABLE, "PySide6 is not installed")
 class UpdateChainTests(unittest.TestCase):
     """'Update all outdated titles' installs each outdated product in sequence."""
 

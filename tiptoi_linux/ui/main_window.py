@@ -310,6 +310,7 @@ class TiptoiWindow(QMainWindow):
         self.pen_panel.choose_button.clicked.connect(self._choose_pen_folder)
         self.pen_panel.delete_button.clicked.connect(self._start_delete_selected)
         self.pen_panel.installed_list.itemSelectionChanged.connect(self._update_delete_button_enabled)
+        self._header.pen_action_button.clicked.connect(self._on_pen_action_button)
         self.firmware_panel = widgets.FirmwarePanel()
         self.firmware_panel.update_requested.connect(self._start_firmware_update)
         self.update_outdated_button = widgets.pill_button(_("Update all outdated titles"), primary=True)
@@ -617,6 +618,31 @@ class TiptoiWindow(QMainWindow):
         self.pen_panel.choose_button.setEnabled(not running)
         self._update_install_button_enabled()
         self._update_delete_button_enabled()
+        self._update_pen_action_button()
+
+    def _update_pen_action_button(self) -> None:
+        """Upper-right pen action: Unmount when connected, Mount when not mounted."""
+        button = self._header.pen_action_button
+        running = self._pen_job.is_running
+        pen = self._pen()
+        if pen is not None and not pen.is_folder:
+            button.setText(_("Unmount"))
+            button.setAccessibleName(_("Unmount the pen so it can be unplugged"))
+            button.setToolTip(_("Unmount the pen so it can be unplugged"))
+            button.setEnabled(not running)
+            button.show()
+        elif self._connection in (
+            ConnectionState.PLUGGED_IN_UNMOUNTED,
+            ConnectionState.SAFELY_UNMOUNTED,
+        ):
+            button.setText(_("Mount"))
+            button.setAccessibleName(_("Mount the pen"))
+            button.setToolTip(_("Mount the pen"))
+            button.setEnabled(not running)
+            button.show()
+        else:
+            # disconnected, or a user-picked folder (nothing to unmount)
+            button.hide()
 
     # --- pen operations --------------------------------------------------------
 
@@ -695,6 +721,52 @@ class TiptoiWindow(QMainWindow):
             self._show_status(message)
         else:
             self._show_error(message)
+
+    def _on_pen_action_button(self) -> None:
+        if self._pen_job.is_running:
+            return
+        if isinstance(self._connection, Connected):
+            self._start_unmount()
+        else:
+            self._start_mount()
+
+    def _start_unmount(self) -> None:
+        pen = self._pen()
+        if pen is None or pen.is_folder:
+            return
+        services = self._services
+        # WHY: udisks2 unmounts a user-session removable drive without admin rights;
+        # unmount_pen() syncs first so a slow flush cannot hit udisks' own timeout
+        self._run_task(
+            lambda progress: services.unmount_pen(pen),
+            self._on_unmounted,
+            _("Unmounting pen…"),
+        )
+
+    def _on_unmounted(self, result: object) -> None:
+        self._clear_pen(ConnectionState.SAFELY_UNMOUNTED)
+        self._show_status(_("Pen unmounted — safe to unplug"))
+
+    def _start_mount(self) -> None:
+        services = self._services
+
+        def mount(progress):
+            pen = services.mount_pen()
+            return pen, pen
+
+        self._run_pen_op(
+            mount,
+            _("Mounting pen…"),
+            describe=lambda pen: _("Pen mounted: {path}").format(path=pen.mountpoint),
+            on_failure=self._on_mount_failed,
+        )
+
+    def _on_mount_failed(self, message: str) -> None:
+        # WHY: a failed Mount after a deliberate Unmount must not leave the state stuck at
+        # SAFELY_UNMOUNTED (the poll never auto-detects there) - fall back to whatever the
+        # device presence says, same as a failed detect
+        self._clear_pen(self._state_without_pen())
+        self._show_error(message)
 
     def _start_install_selected(self) -> None:
         self._install_product(self._selected_product())

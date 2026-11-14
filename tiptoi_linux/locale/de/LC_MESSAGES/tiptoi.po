@@ -1056,3 +1056,9 @@ msgstr "Firmware-Update für diese Stiftgeneration nicht verfügbar"
 
 msgid "The catalog firmware is for a different pen generation - no update offered."
 msgstr "Die Katalog-Firmware ist für eine andere Stiftgeneration - kein Update angeboten."
+
+msgid "Mount"
+msgstr "Einhängen"
+
+msgid "Unmount"
+msgstr "Aushängen"

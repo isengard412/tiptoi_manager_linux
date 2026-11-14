@@ -682,3 +682,9 @@ msgstr "Mise à jour du micrologiciel indisponible pour cette génération de st
 
 msgid "The catalog firmware is for a different pen generation - no update offered."
 msgstr "Le micrologiciel du catalogue ne correspond pas à cette génération de stylo - aucune mise à jour proposée."
+
+msgid "Mount"
+msgstr "Monter"
+
+msgid "Unmount"
+msgstr "Démonter"

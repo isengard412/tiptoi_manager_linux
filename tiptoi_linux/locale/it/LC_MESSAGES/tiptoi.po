@@ -682,3 +682,9 @@ msgstr "Aggiornamento firmware non disponibile per questa generazione di penna"
 
 msgid "The catalog firmware is for a different pen generation - no update offered."
 msgstr "Il firmware del catalogo è per un'altra generazione di penna - nessun aggiornamento offerto."
+
+msgid "Mount"
+msgstr "Monta"
+
+msgid "Unmount"
+msgstr "Smonta"

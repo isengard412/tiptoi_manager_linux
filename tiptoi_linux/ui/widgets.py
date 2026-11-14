@@ -134,6 +134,13 @@ class HeaderBar(QWidget):
 
         self.pen_card = PenCard()
 
+        # Context action for the pen, upper right: Unmount when connected, Mount when
+        # plugged in but not mounted (udisks2 needs no admin rights for either).
+        self.pen_action_button = QPushButton(_("Unmount"))
+        self.pen_action_button.setObjectName("PenActionButton")
+        self.pen_action_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.pen_action_button.hide()
+
         self.options_button = QPushButton(_("Options"))
         self.options_button.setObjectName("OptionsButton")
         self.options_menu = QMenu(self.options_button)
@@ -144,6 +151,8 @@ class HeaderBar(QWidget):
         layout.addLayout(logo_block)
         layout.addStretch()
         layout.addWidget(self.pen_card)
+        layout.addSpacing(10)
+        layout.addWidget(self.pen_action_button)
         layout.addSpacing(10)
         layout.addWidget(self.options_button)
 

@@ -51,7 +51,7 @@ def build_style_sheet() -> str:
     }}
     QLabel#LogoSub {{ color: {FRAME_TEAL}; font-size: 11px; }}
 
-    QPushButton#OptionsButton {{
+    QPushButton#OptionsButton, QPushButton#PenActionButton {{
         background: {BG_WHITE};
         color: {FRAME_TEAL};
         border: 1px solid {BORDER_LIGHT};
@@ -59,7 +59,10 @@ def build_style_sheet() -> str:
         padding: 5px 14px;
         font-size: 13px;
     }}
-    QPushButton#OptionsButton:hover {{ border-color: {BRAND_ORANGE}; color: {BRAND_ORANGE_DEEP}; }}
+    QPushButton#OptionsButton:hover, QPushButton#PenActionButton:hover {{
+        border-color: {BRAND_ORANGE};
+        color: {BRAND_ORANGE_DEEP};
+    }}
 
     /* --- pen card in the header --------------------------------------- */
     PenCard {{
